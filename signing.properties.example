@@ -1,0 +1,6 @@
+# Copy this file to signing.properties and replace every placeholder before
+# creating a signed release build. Never commit signing.properties or a keystore.
+storeFile=keystore/arrow-puzzle-release.jks
+storePassword=REPLACE_WITH_KEYSTORE_PASSWORD
+keyAlias=REPLACE_WITH_KEY_ALIAS
+keyPassword=REPLACE_WITH_KEY_PASSWORD
