@@ -17,8 +17,22 @@ sdk.dir=C\:\\Users\\your-user\\AppData\\Local\\Android\\Sdk
 .\build.ps1 -Variant Debug
 ```
 
-The starter opens with the game home screen. Play transitions to an interactive
-Level 1 board prototype.
+The app opens on the home screen, then the level-select grid. Ten pack-1 levels
+ship as JSON assets in `app/src/main/assets/levels`.
+
+## View Levels
+
+A dependency-free desktop viewer renders every level asset and reports whether
+it is solvable. Double-click `tools\view-levels.cmd`, or from PowerShell:
+
+```powershell
+.\tools\LevelViewer.ps1                       # window with Prev/Next and removal order
+.\tools\LevelViewer.ps1 -Dump                 # text summary, no window
+.\tools\LevelViewer.ps1 -ExportTo tools\snapshots   # write one PNG per level
+```
+
+In the window, use Prev/Next or the arrow keys, and tick "Show removal order"
+to overlay a valid clearing sequence.
 
 ## Current Build Setup
 

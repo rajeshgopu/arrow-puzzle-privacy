@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+  body { background:#E4E9DE; margin:0; display:flex; gap:24px; padding:24px; font-family: sans-serif; }
+  .wrap { display:flex; flex-direction:column; gap:8px; }
+  h3 { margin:0; font-size:14px; color:#113C47; }
+</style>
+</head>
+<body>
+<div class="wrap"><h3>Current algorithm</h3><canvas id="c" width="600" height="600"></canvas></div>
+<div class="wrap"><h3>Proposed (plain small arrows)</h3><canvas id="p" width="600" height="600"></canvas></div>
+<script>
+const level = {"id":"pack-02-level-01","pack":2,"order":1,"width":5,"height":5,"tiles":[{"row":3,"column":3,"direction":"RIGHT","cells":[{"row":3,"column":2},{"row":3,"column":3}]},{"row":2,"column":4,"direction":"UP"},{"row":4,"column":2,"direction":"DOWN"},{"row":3,"column":1,"direction":"RIGHT"},{"row":0,"column":2,"direction":"RIGHT"},{"row":1,"column":1,"direction":"UP","cells":[{"row":1,"column":2},{"row":1,"column":1}]},{"row":2,"column":2,"direction":"UP"},{"row":1,"column":3,"direction":"UP","cells":[{"row":2,"column":3},{"row":1,"column":3}]},{"row":2,"column":1,"direction":"RIGHT"},{"row":2,"column":0,"direction":"LEFT"}],"parMoves":10};
+
+const gap = 8;
+const W = 600, H = 600;
+const cols = level.width, rows = level.height;
+const cellW = (W - (cols-1)*gap)/cols;
+const cellH = (H - (rows-1)*gap)/rows;
+const stroke = Math.min(cellW, cellH)*0.22;
+const colors = ['#2BE7FF','#FF3DCE','#A6FF3D','#FFD11A','#9B5CFF'];
+
+function center(r,c){ return {x: c*(cellW+gap)+cellW/2, y: r*(cellH+gap)+cellH/2}; }
+function hexA(hex,a){ const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16); return `rgba(${r},${g},${b},${a})`; }
+function dirVec(dir){ if(dir==='RIGHT')return[1,0]; if(dir==='LEFT')return[-1,0]; if(dir==='UP')return[0,-1]; return[0,1]; }
+function arrowHead(cx,cy,dir,r){
+  const [fx,fy]=dirVec(dir);
+  const tip={x:cx+fx*r,y:cy+fy*r};
+  const back={x:cx-fx*r*0.7,y:cy-fy*r*0.7};
+  const px=-fy*r*0.9, py=fx*r*0.9;
+  return [tip,{x:back.x+px,y:back.y+py},{x:back.x-px,y:back.y-py}];
+}
+function tri(ctx,t,fill){ ctx.beginPath(); ctx.moveTo(t[0].x,t[0].y); ctx.lineTo(t[1].x,t[1].y); ctx.lineTo(t[2].x,t[2].y); ctx.closePath(); ctx.fillStyle=fill; ctx.fill(); }
+
+// ---- current ----
+{
+  const ctx = document.getElementById('c').getContext('2d');
+  ctx.fillStyle='#F3F5EC'; ctx.fillRect(0,0,W,H);
+  level.tiles.forEach((tile,index)=>{
+    const cells = tile.cells || [{row:tile.row,column:tile.column}];
+    const color = colors[index%5];
+    ctx.beginPath();
+    cells.forEach((cell,i)=>{ const p=center(cell.row,cell.column); if(i===0)ctx.moveTo(p.x,p.y); else ctx.lineTo(p.x,p.y); });
+    ctx.lineCap='round'; ctx.lineJoin='round';
+    ctx.strokeStyle='rgba(17,60,71,0.16)'; ctx.lineWidth=stroke*1.25; ctx.stroke();
+    ctx.strokeStyle=hexA(color,0.20); ctx.lineWidth=stroke*2.1; ctx.stroke();
+    ctx.strokeStyle=color; ctx.lineWidth=stroke; ctx.stroke();
+    const head = cells[cells.length-1];
+    const hc = center(head.row, head.column);
+    const t = arrowHead(hc.x,hc.y,tile.direction,stroke*1.55);
+    tri(ctx,t,hexA(color,0.22)); tri(ctx,t,color);
+  });
+}
+
+// ---- proposed ----
+{
+  const ctx = document.getElementById('p').getContext('2d');
+  ctx.fillStyle='#F3F5EC'; ctx.fillRect(0,0,W,H);
+  const shaft = Math.min(cellW,cellH)*0.14;
+  const headLen = Math.min(cellW,cellH)*0.30;
+  const headHalf = Math.min(cellW,cellH)*0.22;
+  const shaftLen = Math.min(cellW,cellH)*0.16;
+  level.tiles.forEach((tile,index)=>{
+    const cells = tile.cells || [{row:tile.row,column:tile.column}];
+    const color = colors[index%5];
+    const pts = cells.map(c=>center(c.row,c.column));
+    const [fx,fy]=dirVec(tile.direction);
+    const headC = pts[pts.length-1];
+    const base = {x: headC.x - fx*headLen*0.55, y: headC.y - fy*headLen*0.55};
+    // single-cell arrows get a short shaft stub behind the head
+    const start = cells.length === 1
+      ? {x: headC.x - fx*(headLen*0.55 + shaftLen), y: headC.y - fy*(headLen*0.55 + shaftLen)}
+      : pts[0];
+    ctx.beginPath();
+    ctx.moveTo(start.x, start.y);
+    pts.forEach((p,i)=>{ if(i>0)ctx.lineTo(p.x,p.y); });
+    ctx.lineCap='round'; ctx.lineJoin='round';
+    ctx.strokeStyle=color; ctx.lineWidth=shaft; ctx.stroke();
+    // head
+    const tip={x:headC.x+fx*headLen*0.55,y:headC.y+fy*headLen*0.55};
+    const px=-fy*headHalf, py=fx*headHalf;
+    ctx.beginPath();
+    ctx.moveTo(tip.x,tip.y);
+    ctx.lineTo(base.x+px,base.y+py);
+    ctx.lineTo(base.x-px,base.y-py);
+    ctx.closePath();
+    ctx.fillStyle=color; ctx.fill();
+  });
+}
+</script>
+</body>
+</html>

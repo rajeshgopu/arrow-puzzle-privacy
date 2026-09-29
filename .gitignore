@@ -11,5 +11,6 @@ signing.properties
 *.apk
 *.aab
 captures/
+tools/snapshots/
 .externalNativeBuild/
 .DS_Store
