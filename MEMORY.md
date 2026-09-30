@@ -19,7 +19,7 @@
 ## Technology Decisions
 
 - Kotlin + Jetpack Compose + Material 3.
-- Android package and application ID: `com.gopu.arrowpuzzle`.
+- Android package and application ID: `com.gopu.arrow.puzzle.game`.
 - Android target API 36 and proposed minimum API 24.
 - DataStore Preferences for progression and settings.
 - Levels are versioned JSON assets.
@@ -51,7 +51,7 @@
 - [x] Created an interactive home-to-level visual prototype.
 - [x] Generated the Gradle 8.10.2 wrapper.
 - [x] Verified Gradle project configuration reaches Android SDK resolution.
-- [x] Built and verified the debug APK for `com.gopu.arrowpuzzle`.
+- [x] Built and verified the debug APK for `com.gopu.arrow.puzzle.game`.
 - [x] Pinned Kotlin compilation to JVM 17 to match Android Java compatibility.
 - [x] Added reusable Debug and Release PowerShell build commands.
 - [x] Added an ignored placeholder-based release signing configuration.

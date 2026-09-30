@@ -96,7 +96,7 @@ directions, and that a solution exists before a level is shipped.
 ### Package Boundaries
 
 ```text
-com.example.arrowpuzzle
+com.gopu.arrow.puzzle.game
   app/          Application setup and navigation
   game/         Pure board rules, level parsing, validation, and state reducer
   levels/       JSON assets and level repository

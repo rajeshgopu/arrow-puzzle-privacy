@@ -23,11 +23,11 @@ kotlin {
 }
 
 android {
-    namespace = "com.gopu.arrowpuzzle"
+    namespace = "com.gopu.arrow.puzzle.game"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.gopu.arrowpuzzle"
+        applicationId = "com.gopu.arrow.puzzle.game"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
