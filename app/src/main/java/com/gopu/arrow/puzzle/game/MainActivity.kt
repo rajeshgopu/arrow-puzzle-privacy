@@ -7,8 +7,8 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import com.gopu.arrow.puzzle.game.ads.AdConsent
 import com.gopu.arrow.puzzle.game.app.ArrowPuzzleApp
+import com.gopu.arrow.puzzle.game.ads.AdConsent
 import com.gopu.arrow.puzzle.game.ui.theme.ArrowPuzzleTheme
 
 class MainActivity : ComponentActivity() {
@@ -16,8 +16,17 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         applyImmersiveMode()
-        AdConsent.request(this)
         setContent { ArrowPuzzleTheme { ArrowPuzzleApp() } }
+    }
+
+    /**
+     * Consent is re-read on every foreground pass rather than once at launch,
+     * so a form answered (or left open) across a pause still releases the ad
+     * gate, and a declined player is asked again next time they open the app.
+     */
+    override fun onStart() {
+        super.onStart()
+        AdConsent.request(this)
     }
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {

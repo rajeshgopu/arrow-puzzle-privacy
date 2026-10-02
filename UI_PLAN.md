@@ -54,22 +54,23 @@ Implemented (`ui/HomeScreen.kt`, art in `ui/components/HomeArt.kt`).
 │     ▌  ARROW   ▐            │  chunky logotype: 8-pass cocoa outline,
 │   ▙  ▌ PUZZLE  ▟            │  3-pass extrusion, gold over ice
 │         ▛▀▀▜      ▼          │  three floating arrow cubes orbit it
-│   ░░░▒▒▓▓██▓▒░░░░░░░        │
-│  ░░▒▒  ↑   →→→→  ↓  ▒▒░░    │  4x4 floor of glossy cubes in perspective,
-│  ░▒▒  ←           ▒▒▒░      │  light firing out of the blue arrow
 │  ╭───────────╮ ╭───────────╮ │
-│  │ ♛ LEVEL 17│ │★ STARS 40 │ │  frosted glass plates
-│  ╰───────────╯ ╰───────────╯ │
-│      ╭─────────────╮         │  gold PLAY pill + banner slot
-│      │  ▶  PLAY    │         │
+│  │ ♛ LEVEL 17│ │★ STARS 40 │ │  frosted glass plates; the level one
+│  ╰───────────╯ ╰───────────╯ │  opens that level directly
+│                              │
+│                              │
+│      ╭─────────────╮         │  gold PLAY pill, held at the optical
+│      │  ▶  PLAY    │         │  centre of the space below the plates
 │      ╰─────────────╯         │
+│           ( banner )         │  banner slot, pinned above the safe area
 └──────────────────────────────┘
 ```
-Reading order: wordmark and its orbiting cubes, the board they are a sample of,
-the two numbers, then the action, with settings last in the corner. Everything is
-vector art drawn light-on-dark, block sizes follow the content width and the
-flexible parts are weighted, so the composition holds from 4:5 to 21:9 with the
-action button always inside the safe area.
+Three things and nothing competing: the wordmark and its orbiting cubes, the two
+numbers directly under them, and the action held at the optical centre of the
+space below. There is no board between them. Everything is vector art drawn
+light-on-dark, block sizes follow the content width, and the two gaps either side
+of the action are weighted, so the action lands in the same place from a 4:5
+phone to a 21:9 one and always inside the safe area.
 
 ### 3.2 Level Select
 Exists as a 3-column grid (`ui/LevelSelectScreen.kt`). Reference game uses a

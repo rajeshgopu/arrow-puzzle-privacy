@@ -57,6 +57,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.gopu.arrow.puzzle.game.AppConfig
+import com.gopu.arrow.puzzle.game.ads.findActivity
 import com.gopu.arrow.puzzle.game.data.ProgressRepository
 import com.gopu.arrow.puzzle.game.ui.components.DimOverlay
 import com.gopu.arrow.puzzle.game.ui.components.LaunchAnimationStyle
@@ -83,6 +84,7 @@ fun SettingsScreen(
     val sampleSounds = rememberSounds(enabled = true)
     val sampleHaptics = rememberHaptics(enabled = true)
     var showHowToPlay by remember { mutableStateOf(false) }
+    var privacyOptionsMessage by remember { mutableStateOf<String?>(null) }
     val versionName = remember(context) {
         runCatching {
             context.packageManager.getPackageInfo(context.packageName, 0).versionName
@@ -159,7 +161,16 @@ fun SettingsScreen(
                     SettingsActionRow(
                         title = "Privacy Options",
                         icon = Icons.Default.Policy,
-                        onClick = { /* UMP form opens here once integrated (Phase 4) */ }
+                        onClick = {
+                            val host = context.findActivity() ?: return@SettingsActionRow
+                            AppConfig.openPrivacyOptions(host) { formShown ->
+                                privacyOptionsMessage = if (formShown) {
+                                    "Consent choices saved."
+                                } else {
+                                    "No choices to make here: consent is not required in your region."
+                                }
+                            }
+                        }
                     )
                 }
                 val policyUrl = AppConfig.privacyPolicyUrl
@@ -178,6 +189,18 @@ fun SettingsScreen(
             }
 
             Spacer(Modifier.weight(1f))
+
+            val optionsMessage = privacyOptionsMessage
+            if (optionsMessage != null) {
+                Text(
+                    text = optionsMessage,
+                    color = InkSoft,
+                    fontWeight = FontWeight.Medium,
+                    fontSize = 12.sp,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp)
+                )
+            }
 
             Text(
                 text = "Arrow Puzzle  •  v$versionName",

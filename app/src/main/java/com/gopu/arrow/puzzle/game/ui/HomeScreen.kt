@@ -33,7 +33,6 @@ import com.gopu.arrow.puzzle.game.Direction
 import com.gopu.arrow.puzzle.game.ads.AdHost
 import com.gopu.arrow.puzzle.game.ads.BannerAdSlot
 import com.gopu.arrow.puzzle.game.data.ProgressRepository
-import com.gopu.arrow.puzzle.game.ui.components.ArrowBoardScene
 import com.gopu.arrow.puzzle.game.ui.components.FloatingArrowTile
 import com.gopu.arrow.puzzle.game.ui.components.GlassStatCard
 import com.gopu.arrow.puzzle.game.ui.components.GlossyIconButton
@@ -65,18 +64,23 @@ private const val TileClearance = 0.05f
 /**
  * Main menu.
  *
- * Reading order is deliberate: the wordmark and the three arrow cubes that orbit
- * it, the board they are a sample of, the two numbers, and then the action, with
- * settings last in the corner. The block sizes come off the content width and
- * everything flexible is weighted, so the composition holds from a short 4:5
- * phone to a tall 21:9 one and the action button always sits inside the safe
- * area above the gesture bar.
+ * Three things on the screen and nothing competing with them: the wordmark and
+ * the three arrow cubes that orbit it, the two numbers underneath it, and the
+ * action held at the optical centre of everything below. The block sizes come
+ * off the content width and the two gaps either side of the action are weighted,
+ * so the action lands in the same place on a short 4:5 phone and a tall 21:9 one,
+ * and always sits inside the safe area above the gesture bar.
+ *
+ * Both numbers are on show at once but only one of them is a control: the level
+ * plate is the way straight back into the level it reports, and the star total
+ * is a tally, not a door.
  */
 @Composable
 fun HomeScreen(
     progressRepository: ProgressRepository,
     onPlay: () -> Unit,
     onSettings: () -> Unit,
+    onPlayLevel: (levelOrder: Int) -> Unit = {},
     ads: AdHost? = null
 ) {
     val highestUnlocked by progressRepository.highestUnlockedLevel.collectAsState(initial = 1)
@@ -105,28 +109,30 @@ fun HomeScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = gutter, vertical = 16.dp),
+                .padding(horizontal = gutter, vertical = 18.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(Modifier.height(12.dp))
-            Spacer(Modifier.weight(0.30f))
+            Spacer(Modifier.height(10.dp))
+            Spacer(Modifier.weight(0.34f))
 
             WordmarkBlock(fontSize = titleSize)
 
-            Spacer(Modifier.weight(0.30f))
-
-            ArrowBoardScene(modifier = Modifier.fillMaxWidth().weight(1.15f))
-
-            Spacer(Modifier.height(18.dp))
+            Spacer(Modifier.height(26.dp))
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(14.dp)
             ) {
+                /*
+                 * The level plate doubles as the shortcut into the level it is
+                 * showing, so a player on the menu can get straight back to where
+                 * they were without walking through the level select.
+                 */
                 GlassStatCard(
                     label = "LEVEL",
                     value = highestUnlocked.toString(),
                     badge = StatBadge.CROWN,
+                    onClick = { onPlayLevel(highestUnlocked) },
                     modifier = Modifier.weight(1f)
                 )
                 GlassStatCard(
@@ -137,13 +143,23 @@ fun HomeScreen(
                 )
             }
 
-            Spacer(Modifier.height(18.dp))
-
-            BannerAdSlot(adHost = ads)
+            /*
+             * The play button is the centre of the screen now that the board has
+             * gone, so it is placed between the two weighted gaps rather than in
+             * the flow: whatever height is left over is shared either side of it,
+             * and the shorter share above puts the button at the optical centre
+             * of the whole composition on every screen from a short 4:5 one to a
+             * tall 21:9 one.
+             */
+            Spacer(Modifier.weight(0.85f))
 
             PlayButton(onClick = onPlay)
 
-            Spacer(Modifier.height(10.dp))
+            Spacer(Modifier.weight(1.15f))
+
+            BannerAdSlot(adHost = ads)
+
+            Spacer(Modifier.height(12.dp))
         }
 
         GlossyIconButton(

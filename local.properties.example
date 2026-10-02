@@ -1,0 +1,22 @@
+# Copy these keys into local.properties (gitignored) or pass them as
+# -P<key>=... on the Gradle command line. Every key is optional: each one falls
+# back to a working default, and the build warns about anything still unset.
+
+# --- AdMob -------------------------------------------------------------------
+# The AdMob App ID from the AdMob console (Home > App settings). It is the
+# publisher ID with "~<digits>", e.g. ca-app-pub-3319834061576964~1234567890.
+# Without it a release build ships Google's test App ID, which the SDK refuses
+# to serve against this app's own ad units - no fill, no crash.
+admob.appId=
+
+# Ad unit IDs. The defaults are the published production units, so these only
+# need changing if the units are ever replaced in the AdMob console.
+admob.bannerUnitId=ca-app-pub-3319834061576964/5314734915
+admob.rewardedUnitId=ca-app-pub-3319834061576964/1474813821
+admob.interstitialUnitId=ca-app-pub-3319834061576964/2352781229
+
+# --- Play Store listing ------------------------------------------------------
+# Public privacy-policy page. The Play Console requires one on the Data Safety
+# and store listing forms, and Settings hides its Privacy Policy row while this
+# is blank.
+privacyPolicyUrl=

@@ -58,8 +58,8 @@ internal class ArrowShape(
     private val bendRadius = unit * 0.42f
 
     /** Arrowhead dimensions. */
-    private val headLength = unit * 0.28f
-    private val headWidth = unit * 0.20f
+    private val headLength = unit * 0.30f
+    private val headWidth = unit * 0.22f
 
     /** Small overlap between tube and arrowhead. */
     private val headOverlap = unit * 0.025f
@@ -272,71 +272,51 @@ internal class ArrowShape(
         )
 
         /*
-         * Tip lies directly on the continuation of the final segment.
+         * UPDATED ARROWHEAD
+         *
+         * Keep the shaft/body geometry unchanged.
+         * Only the arrowhead is changed to a clean, compact triangular
+         * arrowhead like the target design:
+         *
+         *                    TIP
+         *                     /\\
+         *                    /  \\
+         *                   /    \\
+         *                  /______\\
+         *                     ||
+         *                   SHAFT
+         *
+         * The tip follows the actual final segment, so RIGHT / LEFT /
+         * UP / DOWN all remain correctly oriented.
          */
         val tipPoint = Offset(
             x = connection.x + fx * headLength,
             y = connection.y + fy * headLength
         )
 
-        /*
-         * Narrow neck where the tube enters the arrowhead.
-         *
-         * This is intentionally close to the tube width so the
-         * arrowhead does not look like a separate triangle.
-         */
-        val neckHalfWidth = strokeWidth * 0.62f
+        // Slightly wider than the shaft so the head reads clearly,
+        // without becoming a separate oversized shape.
+        val headHalfWidth = headWidth * 0.50f
 
-        val neckA = Offset(
-            x = connection.x + perp.x * neckHalfWidth,
-            y = connection.y + perp.y * neckHalfWidth
+        val baseTop = Offset(
+            x = connection.x + perp.x * headHalfWidth,
+            y = connection.y + perp.y * headHalfWidth
         )
 
-        val neckB = Offset(
-            x = connection.x - perp.x * neckHalfWidth,
-            y = connection.y - perp.y * neckHalfWidth
+        val baseBottom = Offset(
+            x = connection.x - perp.x * headHalfWidth,
+            y = connection.y - perp.y * headHalfWidth
         )
 
         /*
-         * Wings flare outward slightly in front of the neck.
-         */
-        val wingCenter = Offset(
-            x = connection.x + fx * headLength * 0.32f,
-            y = connection.y + fy * headLength * 0.32f
-        )
-
-        val wingHalfWidth = headWidth * 0.5f
-
-        val wingA = Offset(
-            x = wingCenter.x + perp.x * wingHalfWidth,
-            y = wingCenter.y + perp.y * wingHalfWidth
-        )
-
-        val wingB = Offset(
-            x = wingCenter.x - perp.x * wingHalfWidth,
-            y = wingCenter.y - perp.y * wingHalfWidth
-        )
-
-        /*
-         * Arrowhead polygon:
-         *
-         *                TIP
-         *                 ▲
-         *                / \
-         *          wing /   \ wing
-         *              /     \
-         *          neck       neck
-         *             \       /
-         *              ───────
-         *
-         * The neck overlaps the tube slightly.
+         * A simple 3-point arrowhead.
+         * The shaft meets the centre of the flat base, giving a clean
+         * continuous arrow silhouette.
          */
         val headOutline = listOf(
             tipPoint,
-            wingA,
-            neckA,
-            neckB,
-            wingB
+            baseTop,
+            baseBottom
         )
 
         head = kitePath(headOutline)
@@ -345,48 +325,30 @@ internal class ArrowShape(
         headPivot = centroidOf(headOutline)
 
         /*
-         * Smaller bright core.
+         * Smaller bright inner triangle.
          */
         val coreTip = Offset(
             x = connection.x + fx * headLength * 0.88f,
             y = connection.y + fy * headLength * 0.88f
         )
 
-        val coreWingCenter = Offset(
-            x = connection.x + fx * headLength * 0.30f,
-            y = connection.y + fy * headLength * 0.30f
+        val coreHalfWidth = headWidth * 0.24f
+
+        val coreBaseTop = Offset(
+            x = connection.x + perp.x * coreHalfWidth,
+            y = connection.y + perp.y * coreHalfWidth
         )
 
-        val coreWingHalf = headWidth * 0.25f
-        val coreNeckHalf = strokeWidth * 0.40f
-
-        val coreWingA = Offset(
-            x = coreWingCenter.x + perp.x * coreWingHalf,
-            y = coreWingCenter.y + perp.y * coreWingHalf
-        )
-
-        val coreWingB = Offset(
-            x = coreWingCenter.x - perp.x * coreWingHalf,
-            y = coreWingCenter.y - perp.y * coreWingHalf
-        )
-
-        val coreNeckA = Offset(
-            x = connection.x + perp.x * coreNeckHalf,
-            y = connection.y + perp.y * coreNeckHalf
-        )
-
-        val coreNeckB = Offset(
-            x = connection.x - perp.x * coreNeckHalf,
-            y = connection.y - perp.y * coreNeckHalf
+        val coreBaseBottom = Offset(
+            x = connection.x - perp.x * coreHalfWidth,
+            y = connection.y - perp.y * coreHalfWidth
         )
 
         headCore = kitePath(
             listOf(
                 coreTip,
-                coreWingA,
-                coreNeckA,
-                coreNeckB,
-                coreWingB
+                coreBaseTop,
+                coreBaseBottom
             )
         )
 
@@ -401,8 +363,8 @@ internal class ArrowShape(
          */
 
         headGlows = listOf(
-            1.13f to 0.07f,
-            1.06f to 0.20f
+            1.10f to 0.07f,
+            1.04f to 0.20f
         ).map { (factor, alpha) ->
 
             val glowTip = Offset(
@@ -410,43 +372,24 @@ internal class ArrowShape(
                 y = connection.y + fy * headLength * factor
             )
 
-            val glowWingCenter = Offset(
-                x = connection.x + fx * headLength * 0.32f * factor,
-                y = connection.y + fy * headLength * 0.32f * factor
+            val glowHalfWidth = headWidth * 0.50f * factor
+
+            val glowBaseTop = Offset(
+                x = connection.x + perp.x * glowHalfWidth,
+                y = connection.y + perp.y * glowHalfWidth
             )
 
-            val glowWingHalf = headWidth * 0.5f * factor
-
-            val glowWingA = Offset(
-                x = glowWingCenter.x + perp.x * glowWingHalf,
-                y = glowWingCenter.y + perp.y * glowWingHalf
-            )
-
-            val glowWingB = Offset(
-                x = glowWingCenter.x - perp.x * glowWingHalf,
-                y = glowWingCenter.y - perp.y * glowWingHalf
-            )
-
-            val glowNeckHalf = strokeWidth * 0.62f * factor
-
-            val glowNeckA = Offset(
-                x = connection.x + perp.x * glowNeckHalf,
-                y = connection.y + perp.y * glowNeckHalf
-            )
-
-            val glowNeckB = Offset(
-                x = connection.x - perp.x * glowNeckHalf,
-                y = connection.y - perp.y * glowNeckHalf
+            val glowBaseBottom = Offset(
+                x = connection.x - perp.x * glowHalfWidth,
+                y = connection.y - perp.y * glowHalfWidth
             )
 
             HeadGlow(
                 path = kitePath(
                     listOf(
                         glowTip,
-                        glowWingA,
-                        glowNeckA,
-                        glowNeckB,
-                        glowWingB
+                        glowBaseTop,
+                        glowBaseBottom
                     )
                 ),
                 alpha = alpha

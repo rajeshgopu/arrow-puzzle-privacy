@@ -41,22 +41,14 @@ class AdHost(
 }
 
 /**
- * Ad unit IDs per build type. Debug builds always use Google's public test
- * units so no development or manual testing ever serves or clicks a live ad;
- * release builds use this app's own units.
+ * Ad unit IDs for this build. Debug builds resolve to Google's public test
+ * units from `BuildConfig`, so no development or manual testing ever serves or
+ * clicks a live ad; release builds resolve to this app's own units.
  */
 object AdUnitIds {
-    private const val TEST_REWARDED = "ca-app-pub-3940256099942544/5224354917"
-    private const val TEST_INTERSTITIAL = "ca-app-pub-3940256099942544/1033173712"
-    private const val TEST_BANNER = "ca-app-pub-3940256099942544/9214589741"
-
-    private const val LIVE_REWARDED = "ca-app-pub-3319834061576964/1474813821"
-    private const val LIVE_INTERSTITIAL = "ca-app-pub-3319834061576964/2352781229"
-    private const val LIVE_BANNER = "ca-app-pub-3319834061576964/5314734915"
-
-    val REWARDED: String = if (BuildConfig.DEBUG) TEST_REWARDED else LIVE_REWARDED
-    val INTERSTITIAL: String = if (BuildConfig.DEBUG) TEST_INTERSTITIAL else LIVE_INTERSTITIAL
-    val BANNER: String = if (BuildConfig.DEBUG) TEST_BANNER else LIVE_BANNER
+    val REWARDED: String = BuildConfig.ADMOB_REWARDED_UNIT_ID
+    val INTERSTITIAL: String = BuildConfig.ADMOB_INTERSTITIAL_UNIT_ID
+    val BANNER: String = BuildConfig.ADMOB_BANNER_UNIT_ID
 }
 
 /**

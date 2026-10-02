@@ -168,6 +168,7 @@ private fun Screen(
     onOpenSettings: (AppScreen) -> Unit,
     onBackFromSettings: () -> Unit,
     onLevelClick: (PuzzleLevel) -> Unit,
+    onPlayLevel: (Int) -> Unit,
     onNextLevel: (PuzzleLevel?) -> Unit,
     levelRepository: LevelRepository,
     adHost: AdHost
@@ -177,6 +178,7 @@ private fun Screen(
             progressRepository = progressRepository,
             onPlay = { onNavigate(AppScreen.LEVEL_SELECT) },
             onSettings = { onOpenSettings(AppScreen.HOME) },
+            onPlayLevel = onPlayLevel,
             ads = adHost
         )
         AppScreen.SETTINGS -> SettingsScreen(
@@ -315,6 +317,21 @@ fun ArrowPuzzleApp() {
     }
 
     /*
+     * The menu's level plate: straight into the level it reports. Loads the level
+     * the same way the level select does, falling back to the first level rather
+     * than dropping the player on a board that was never read.
+     */
+    fun openLevelOrder(order: Int) {
+        val bounded = order.coerceIn(1, PACK_COUNT * LEVELS_PER_PACK)
+        val pack = (bounded - 1) / LEVELS_PER_PACK + 1
+        val within = (bounded - 1) % LEVELS_PER_PACK + 1
+        currentLevel = levelRepository.loadLevel(pack, within)
+            ?: levelRepository.loadLevel(1, 1)
+            ?: FallbackLevel
+        navigateTo(AppScreen.GAMEPLAY)
+    }
+
+    /*
      * Nothing starts moving until the menu underneath has been measured and
      * drawn. Waiting on a real frame rather than on a timer is what keeps the
      * first animated frame the frame the user sees, on a fast device and a slow
@@ -370,6 +387,7 @@ fun ArrowPuzzleApp() {
                         currentLevel = level
                         navigateTo(AppScreen.GAMEPLAY)
                     },
+                    onPlayLevel = { order -> openLevelOrder(order) },
                     onNextLevel = { level -> level?.let { currentLevel = it } },
                     levelRepository = levelRepository,
                     adHost = adHost

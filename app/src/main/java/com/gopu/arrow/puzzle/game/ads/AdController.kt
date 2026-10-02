@@ -2,8 +2,6 @@ package com.gopu.arrow.puzzle.game.ads
 
 import android.content.Context
 import android.view.View
-import android.widget.TextView
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -44,28 +42,4 @@ object NoAds : AdController {
     override fun createBannerView(context: Context): View? = null
     override suspend fun showInterstitial() = Unit
     override suspend fun showRewarded(): Boolean = false
-}
-
-/**
- * Offline stand-in that mimics ad playback latency so the rewarded-continue flow
- * can be exercised without the SDK. Used only when AdMob cannot be initialized.
- */
-class SimulatedAdController : AdController {
-    override val canRequestAds: StateFlow<Boolean> = MutableStateFlow(true).asStateFlow()
-    override val bannerAvailable: StateFlow<Boolean> = MutableStateFlow(true).asStateFlow()
-    override val rewardedAvailable: StateFlow<Boolean> = MutableStateFlow(true).asStateFlow()
-
-    override fun createBannerView(context: Context): View = TextView(context).apply {
-        text = "AD"
-        gravity = android.view.Gravity.CENTER
-    }
-
-    override suspend fun showInterstitial() {
-        delay(1_200)
-    }
-
-    override suspend fun showRewarded(): Boolean {
-        delay(1_600)
-        return true
-    }
 }

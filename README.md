@@ -42,9 +42,28 @@ to overlay a valid clearing sequence.
 - Compile and target SDK 36
 - Minimum SDK 24
 
-AdMob is intentionally deferred until the core game loop is implemented. This
-keeps test-ad configuration, consent, and production credentials out of the
-initial screen prototype.
+## AdMob Configuration
+
+AdMob is bound for both build types. Debug builds always resolve to Google's
+public test app and ad unit IDs, so no development or manual testing ever serves
+or clicks a live ad. Release builds resolve to this app's own values, read from
+`local.properties` (or `-P<key>=...`), with the published production ad units
+as the defaults:
+
+```properties
+admob.appId=ca-app-pub-3319834061576964~<digits>
+privacyPolicyUrl=https://<your-public-policy-page>
+```
+
+Use [local.properties.example](local.properties.example) for the full key list.
+Only `admob.appId` and `privacyPolicyUrl` have no usable default: without the
+app ID a release build keeps Google's test App ID and the SDK serves nothing
+against the real ad units, and without the policy URL the Settings row is
+hidden. The build prints a warning for a missing app ID.
+
+Ads sit behind a UMP consent gate, so nothing is requested until Google's
+consent state allows it. Settings > Privacy Options reopens the consent form,
+which is what the Play Store requires once ads are served.
 
 ## Release Signing
 

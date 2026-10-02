@@ -23,6 +23,7 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.graphics.drawscope.rotate
+import androidx.compose.ui.graphics.drawscope.scale
 import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.graphics.graphicsLayer
 import com.gopu.arrow.puzzle.game.Direction
@@ -63,8 +64,8 @@ import kotlin.math.sin
 /**
  * The three tones of one glossy cube: the lit top facet, the face, and the
  * shaded side that shows under the face. [glossyCube] is the single painter for
- * every cube on the menu - the floating arrow tiles, the board and the plain
- * floor cubes - so the whole screen shares one material.
+ * every cube on the menu - the floating arrow tiles around the wordmark and the
+ * hero cube on the splash - so the whole screen shares one material.
  */
 internal data class TileSkin(val light: Color, val face: Color, val deep: Color)
 
@@ -72,9 +73,7 @@ internal val SkinCyan = TileSkin(TileCyanLight, TileCyan, TileCyanDeep)
 internal val SkinGreen = TileSkin(TileGreenLight, TileGreen, TileGreenDeep)
 internal val SkinRed = TileSkin(TileRedLight, TileRed, TileRedDeep)
 internal val SkinYellow = TileSkin(TileYellowLight, TileYellow, TileYellowDeep)
-internal val SkinAzure = TileSkin(TileAzureLight, TileAzure, TileAzureDeep)
 internal val SkinViolet = TileSkin(TileVioletLight, TileViolet, TileVioletDeep)
-internal val SkinCube = TileSkin(CubeTop, CubeFace, CubeSide)
 
 /** How tall the shaded side of a cube is, as a fraction of its edge. */
 private const val CubeDepth = 0.17f
@@ -662,149 +661,6 @@ internal fun FloatingArrowTile(
             direction = direction,
             glow = skin.light
         )
-    }
-}
-
-/** One cell of the menu board: a skin, and the arrow on it if it carries one. */
-private class BoardCell(val skin: TileSkin, val direction: Direction?)
-
-/**
- * The menu board: a floor of plain cubes with four arrows still sitting on it,
- * and light firing out of the blue one to the right.
- *
- * Every cube is the same size and every row steps down by the same pitch, so the
- * columns line up: the floor reads as a board rather than as a scatter, and the
- * depth comes from the shaded side under each cube, the contact shadow under the
- * front row and the light drawn over the top of it - which is the only motion
- * on the board.
- */private val BoardArt: List<List<BoardCell?>> = listOf(
-    listOf(null, null, null, null, null),
-    listOf(null, BoardCell(SkinGreen, Direction.UP), BoardCell(SkinAzure, Direction.RIGHT), null, null),
-    listOf(BoardCell(SkinYellow, Direction.LEFT), null, BoardCell(SkinRed, Direction.DOWN), null, null)
-)
-
-@Composable
-fun ArrowBoardScene(modifier: Modifier = Modifier) {
-    val reduceMotion = rememberSystemReduceMotion()
-    val beam by rememberInfiniteTransition(label = "menuBeam").animateFloat(
-        initialValue = 0f,
-        targetValue = 1f,
-        animationSpec = infiniteRepeatable(tween(1800, easing = FastOutSlowInEasing), RepeatMode.Reverse),
-        label = "beam"
-    )
-    val energy = if (reduceMotion) 0.6f else beam
-
-    Canvas(modifier) {
-        val columns = BoardArt.first().size
-        val rows = BoardArt.size
-
-        // One pitch for the whole board: 6% taller than a cube so the shaded
-        // side of each row shows through as the gap under it.
-        val pitch = min(size.width / (columns + 0.06f), size.height / (rows + 0.40f))
-        val cell = pitch * 0.94f
-        if (cell <= 0f) return@Canvas
-
-        val boardWidth = pitch * (columns - 1) + cell
-        val boardHeight = pitch * (rows - 1) + cell
-        val left = (size.width - boardWidth) / 2f
-        val top = (size.height - boardHeight) / 2f
-
-        // A soft contact shadow, laid down first so the front row sits on it and
-        // the board reads as standing on the sky rather than pasted onto it.
-        drawOval(
-            brush = Brush.radialGradient(
-                colorStops = arrayOf(
-                    0f to Color.Black.copy(alpha = 0.32f),
-                    1f to Color.Transparent
-                ),
-                center = Offset(size.width * 0.5f, top + boardHeight + cell * 0.10f),
-                radius = boardWidth * 0.55f
-            ),
-            topLeft = Offset(size.width * 0.5f - boardWidth * 0.55f, top + boardHeight - cell * 0.16f),
-            size = Size(boardWidth * 1.10f, cell * 0.70f)
-        )
-
-        // Where the blue arrow sits, so the beam leaves from the right edge of it.
-        var beamOrigin = Offset.Zero
-
-        for (row in 0 until rows) {
-            for (column in 0 until columns) {
-                val art = BoardArt[row][column]
-                val cube = Offset(left + column * pitch, top + row * pitch)
-                if (art == null) {
-                    glossyCube(
-                        topLeft = cube,
-                        edge = cell,
-                        skin = SkinCube,
-                        depth = cell * 0.22f
-                    )
-                    continue
-                }
-                glossyCube(
-                    topLeft = cube,
-                    edge = cell,
-                    skin = art.skin,
-                    direction = art.direction,
-                    depth = cell * 0.22f,
-                    glow = art.skin.light
-                )
-                if (art.skin == SkinAzure) {
-                    beamOrigin = Offset(cube.x + cell, cube.y + cell * 0.39f)
-                }
-            }
-        }
-
-        // Light firing out of the blue arrow, thinning as it leaves the board.
-        val reach = size.width - beamOrigin.x
-        if (reach > 0f) {
-            for (streak in 0 until 4) {
-                val phase = energy + streak * 0.22f
-                val strength = (0.35f + 0.65f * (0.5f + 0.5f * sin(phase * PI.toFloat())))
-                val y = beamOrigin.y + (streak - 1.5f) * cell * 0.10f
-                val thickness = cell * (0.030f + 0.030f * (streak % 2))
-                drawLine(
-                    brush = Brush.horizontalGradient(
-                        colorStops = arrayOf(
-                            0f to Color.White.copy(alpha = 0.70f * strength),
-                            0.35f to TileCyanLight.copy(alpha = 0.45f * strength),
-                            1f to Color.Transparent
-                        ),
-                        startX = beamOrigin.x,
-                        endX = size.width
-                    ),
-                    start = Offset(beamOrigin.x, y),
-                    end = Offset(size.width, y),
-                    strokeWidth = thickness,
-                    cap = StrokeCap.Round
-                )
-            }
-
-            drawCircle(
-                brush = Brush.radialGradient(
-                    colorStops = arrayOf(
-                        0f to Color.White.copy(alpha = 0.55f),
-                        0.45f to TileCyan.copy(alpha = 0.28f),
-                        1f to Color.Transparent
-                    ),
-                    center = beamOrigin,
-                    radius = cell * 1.1f
-                ),
-                radius = cell * 1.1f,
-                center = beamOrigin
-            )
-
-            for (index in 0 until 5) {
-                val phase = energy + index * 0.19f
-                val strength = 0.4f + 0.6f * (0.5f + 0.5f * sin(phase * PI.toFloat() * 1.6f))
-                val x = beamOrigin.x + reach * (0.18f + 0.20f * index)
-                val y = beamOrigin.y + sin(phase * PI.toFloat()) * cell * 0.20f
-                drawSparkle(
-                    center = Offset(x, y),
-                    radius = cell * 0.055f * strength,
-                    color = Color.White.copy(alpha = 0.75f * strength)
-                )
-            }
-        }
     }
 }
 

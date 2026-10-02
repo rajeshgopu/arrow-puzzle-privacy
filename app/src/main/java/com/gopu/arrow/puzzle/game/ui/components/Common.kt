@@ -1,6 +1,7 @@
 package com.gopu.arrow.puzzle.game.ui.components
 
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
@@ -8,6 +9,8 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -56,6 +59,7 @@ import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
@@ -223,36 +227,75 @@ enum class StatBadge { CROWN, STAR }
  * on the right. The plate is a vertical glass gradient with a white rim and a
  * sheen across its top half, and the value is shadowed in deep blue so it keeps
  * its edge against the sky behind it.
+ *
+ * Given an [onClick] the plate is a button - it takes a press, dims and settles
+ * back, and announces itself as one - which is what lets the level plate double
+ * as a way straight into the level it is showing.
  */
 @Composable
 fun GlassStatCard(
     label: String,
     value: String,
     badge: StatBadge,
+    onClick: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     val shape = RoundedCornerShape(24.dp)
     val density = LocalDensity.current
+    val interaction = remember { MutableInteractionSource() }
+    val pressed by interaction.collectIsPressedAsState()
+    val settle = remember { Animatable(1f) }
+
+    LaunchedEffect(pressed) {
+        settle.snapTo(if (pressed) 0.96f else 1f)
+        settle.animateTo(
+            1f,
+            spring(
+                dampingRatio = Spring.DampingRatioMediumBouncy,
+                stiffness = Spring.StiffnessMediumLow
+            )
+        )
+    }
+
+    val plate = modifier
+        .height(84.dp)
+        .graphicsLayer {
+            scaleX = settle.value
+            scaleY = settle.value
+        }
+        .clip(shape)
+        .background(
+            Brush.verticalGradient(
+                0f to GlassTop,
+                0.45f to GlassMid,
+                1f to GlassDeep
+            )
+        )
+        .border(1.5.dp, GlassRim, shape)
 
     Box(
-        modifier = modifier
-            .height(84.dp)
-            .clip(shape)
-            .background(
-                Brush.verticalGradient(
-                    0f to GlassTop,
-                    0.45f to GlassMid,
-                    1f to GlassDeep
+        modifier = if (onClick == null) {
+            plate
+        } else {
+            plate
+                .clickable(
+                    interactionSource = interaction,
+                    indication = null,
+                    onClickLabel = "Play level $value",
+                    onClick = onClick
                 )
-            )
-            .border(1.5.dp, GlassRim, shape)
+                .semantics {
+                    role = Role.Button
+                    contentDescription = "$label $value"
+                }
+        }
     ) {
         Box(
             modifier = Modifier
                 .matchParentSize()
                 .background(
                     Brush.verticalGradient(
-                        0f to Color.White.copy(alpha = 0.26f),
+                        0f to Color.White.copy(alpha = if (pressed) 0.10f else 0.26f),
                         0.55f to Color.Transparent
                     )
                 )
