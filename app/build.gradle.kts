@@ -92,6 +92,13 @@ android {
     buildFeatures {
         buildConfig = true
     }
+
+    // The celebration and the board build real Compose Paths, whose android
+    // counterparts are not implemented off device. Returning defaults instead of
+    // throwing lets the JVM tests exercise the timing maths those objects sit in.
+    testOptions {
+        unitTests.isReturnDefaultValues = true
+    }
 }
 
 dependencies {
