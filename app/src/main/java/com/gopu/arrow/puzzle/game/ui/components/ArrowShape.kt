@@ -38,7 +38,15 @@ internal class ArrowShape(
     top: Float = 0f
 ) {
 
-    private val unit = min(cellWidth, cellHeight)
+    /**
+     * The scale this arrow was actually built at: the smaller of its two cell
+     * edges, in pixels.
+     *
+     * Every launch effect multiplies its own sizes by this, so nothing has to
+     * know the board size, the density, the level's dimensions or whether the
+     * window is portrait or landscape — the arrow is measured, not assumed.
+     */
+    internal val unit = min(cellWidth, cellHeight)
 
     /** Main neon tube width. */
     val strokeWidth = unit * 0.088f

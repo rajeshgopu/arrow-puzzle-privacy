@@ -27,9 +27,13 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.filled.VolumeUp
+import androidx.compose.material.icons.filled.AutoAwesome
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material.icons.filled.Policy
 import androidx.compose.material.icons.filled.Vibration
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
@@ -55,6 +59,7 @@ import androidx.compose.ui.unit.sp
 import com.gopu.arrow.puzzle.game.AppConfig
 import com.gopu.arrow.puzzle.game.data.ProgressRepository
 import com.gopu.arrow.puzzle.game.ui.components.DimOverlay
+import com.gopu.arrow.puzzle.game.ui.components.LaunchAnimationStyle
 import com.gopu.arrow.puzzle.game.ui.components.PrimaryButton
 import com.gopu.arrow.puzzle.game.ui.components.RoundIconButton
 import com.gopu.arrow.puzzle.game.ui.theme.Cloud
@@ -71,6 +76,8 @@ fun SettingsScreen(
 ) {
     val soundEnabled by progressRepository.soundEnabled.collectAsState(initial = true)
     val hapticsEnabled by progressRepository.hapticsEnabled.collectAsState(initial = true)
+    val launchStyle by progressRepository.launchAnimation
+        .collectAsState(initial = LaunchAnimationStyle.Default)
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val sampleSounds = rememberSounds(enabled = true)
@@ -127,6 +134,13 @@ fun SettingsScreen(
                     onCheckedChange = { enabled ->
                         scope.launch { progressRepository.setHapticsEnabled(enabled) }
                         if (enabled) sampleHaptics.sample()
+                    }
+                )
+                SettingsDivider()
+                LaunchAnimationRow(
+                    style = launchStyle,
+                    onSelect = { chosen ->
+                        scope.launch { progressRepository.setLaunchAnimation(chosen) }
                     }
                 )
             }
@@ -243,6 +257,89 @@ private fun SettingsToggleRow(
             onCheckedChange = onCheckedChange,
             colors = SwitchDefaults.colors(checkedTrackColor = Mint)
         )
+    }
+}
+
+/**
+ * The launch animation picker.
+ *
+ * Every style in [LaunchAnimationStyle] is listed so the option set is visible,
+ * and the current one is shown on the row rather than behind a second tap. The
+ * `implemented` guard stays on each entry: a style that has been declared but not
+ * built yet is listed and dimmed instead of quietly doing nothing when picked.
+ */
+@Composable
+private fun LaunchAnimationRow(
+    style: LaunchAnimationStyle,
+    onSelect: (LaunchAnimationStyle) -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { expanded = true }
+            .padding(horizontal = 16.dp, vertical = 10.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(Icons.Default.AutoAwesome, contentDescription = null, tint = Coral, modifier = Modifier.size(24.dp))
+        Spacer(Modifier.width(16.dp))
+        Column(modifier = Modifier.weight(1f)) {
+            Text("Launch Animation", color = Ink, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+            Text("Glow when an arrow leaves", color = InkSoft, fontWeight = FontWeight.Medium, fontSize = 12.sp)
+        }
+        Box {
+            Row(
+                modifier = Modifier
+                    .background(Cloud, RoundedCornerShape(12.dp))
+                    .padding(horizontal = 10.dp, vertical = 6.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = style.label,
+                    color = Ink,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 13.sp
+                )
+                Icon(
+                    Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                    contentDescription = null,
+                    tint = InkSoft,
+                    modifier = Modifier.size(18.dp)
+                )
+            }
+            DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+                LaunchAnimationStyle.options.forEach { option ->
+                    DropdownMenuItem(
+                        text = {
+                            Text(
+                                text = option.label,
+                                color = if (option.implemented) Ink else InkSoft,
+                                fontWeight = if (option == style) FontWeight.Black else FontWeight.Medium,
+                                fontSize = 15.sp
+                            )
+                        },
+                        trailingIcon = if (option == style) {
+                            {
+                                Icon(
+                                    Icons.Default.Check,
+                                    contentDescription = null,
+                                    tint = Coral,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                            }
+                        } else {
+                            null
+                        },
+                        enabled = option.implemented,
+                        onClick = {
+                            expanded = false
+                            onSelect(option)
+                        }
+                    )
+                }
+            }
+        }
     }
 }
 

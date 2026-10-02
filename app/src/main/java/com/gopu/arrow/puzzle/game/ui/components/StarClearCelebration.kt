@@ -958,7 +958,7 @@ internal fun bannerAlpha(
  * celebration holds a single quiet moment instead of firing anything.
  */
 @Composable
-private fun rememberSystemReduceMotion(): Boolean {
+internal fun rememberSystemReduceMotion(): Boolean {
     val context = LocalContext.current
     return remember(context) {
         runCatching {

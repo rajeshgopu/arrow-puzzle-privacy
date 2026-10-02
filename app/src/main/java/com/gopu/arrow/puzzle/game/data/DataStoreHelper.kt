@@ -6,8 +6,10 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import com.gopu.arrow.puzzle.game.ui.components.LaunchAnimationStyle
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
@@ -19,6 +21,7 @@ object DataStoreHelper {
     private val SOUND_ENABLED = booleanPreferencesKey("sound_enabled")
     private val HAPTICS_ENABLED = booleanPreferencesKey("haptics_enabled")
     private val TUTORIAL_SEEN = booleanPreferencesKey("tutorial_seen")
+    private val LAUNCH_ANIMATION = stringPreferencesKey("launch_animation")
 
     suspend fun saveHighestUnlockedLevel(context: Context, level: Int) {
         context.dataStore.edit { prefs ->
@@ -77,5 +80,17 @@ object DataStoreHelper {
 
     fun observeTutorialSeen(context: Context): Flow<Boolean> {
         return context.dataStore.data.map { it[TUTORIAL_SEEN] ?: false }
+    }
+
+    suspend fun saveLaunchAnimation(context: Context, style: LaunchAnimationStyle) {
+        context.dataStore.edit { prefs ->
+            prefs[LAUNCH_ANIMATION] = style.name
+        }
+    }
+
+    fun observeLaunchAnimation(context: Context): Flow<LaunchAnimationStyle> {
+        return context.dataStore.data.map { prefs ->
+            LaunchAnimationStyle.fromName(prefs[LAUNCH_ANIMATION])
+        }
     }
 }

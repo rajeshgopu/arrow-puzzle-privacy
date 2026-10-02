@@ -1,6 +1,5 @@
 package com.gopu.arrow.puzzle.game.ui.components
 
-import android.provider.Settings
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
@@ -23,7 +22,6 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.platform.LocalContext
 import com.gopu.arrow.puzzle.game.ui.theme.HeroCyan
 import com.gopu.arrow.puzzle.game.ui.theme.HeroCyanDeep
 import com.gopu.arrow.puzzle.game.ui.theme.HeroCyanEdge
@@ -308,22 +306,4 @@ private fun DrawScope.arrowPath(
     }
     path.close()
     return path
-}
-
-/**
- * True when the user has turned animations off system wide, in which case the
- * hero should hold a single still frame instead of breathing forever.
- */
-@Composable
-private fun rememberSystemReduceMotion(): Boolean {
-    val context = LocalContext.current
-    return remember(context) {
-        runCatching {
-            Settings.Global.getFloat(
-                context.contentResolver,
-                Settings.Global.ANIMATOR_DURATION_SCALE,
-                1f
-            ) == 0f
-        }.getOrDefault(false)
-    }
 }

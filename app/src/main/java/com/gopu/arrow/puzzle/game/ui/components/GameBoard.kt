@@ -141,6 +141,11 @@ private const val BlockMillis = 460
  * and the red collision burst. Input is handled by hit testing against each
  * arrow's drawn spine, so tapping any part of a bent arrow selects that whole
  * arrow, and TalkBack gets one button node per arrow.
+ *
+ * [launchStyle] picks the departure animation. The board only asks for it, via
+ * [LaunchAnimation.playTapEffect]; every curve, colour and size of the effect
+ * itself lives outside this file, and nothing here reads the style for anything
+ * but that one call.
  */
 @Composable
 fun ArrowBoard(
@@ -152,6 +157,7 @@ fun ArrowBoard(
     highlight: TileHighlight = TileHighlight.NONE,
     block: ArrowBlock? = null,
     launchArrow: ArrowLaunch? = null,
+    launchStyle: LaunchAnimationStyle = LaunchAnimationStyle.Default,
     onLaunchFinished: (Int) -> Unit = {},
     onArrowTap: (Int) -> Unit
 ) {
@@ -187,6 +193,10 @@ fun ArrowBoard(
         }
         val colors = remember(level) { assignArrowColors(level) }
 
+        // The departure animation, owned by [LaunchAnimation]: the board triggers
+        // it and draws whatever it reports, and holds no effect code of its own.
+        val launchAnimation = rememberLaunchAnimation(launchStyle, level.id)
+
         val entrances = remember(level.id) { List(level.tiles.size) { Animatable(0f) } }
         LaunchedEffect(level.id) {
             entrances.forEachIndexed { index, anim ->
@@ -219,6 +229,16 @@ fun ArrowBoard(
         val launchFinished = rememberUpdatedState(onLaunchFinished)
         LaunchedEffect(launchArrow?.trigger, level.id) {
             val spec = launchArrow ?: return@LaunchedEffect
+            // The tap effect fires on the same signal and the same frame as the
+            // departure, so the pulse is already open under the arrow as it goes.
+            val tapped = shapes.getOrNull(spec.tileIndex)
+            if (tapped != null) {
+                launchAnimation.playTapEffect(
+                    arrow = tapped,
+                    color = colors.getOrElse(spec.tileIndex) { NeonCyan },
+                    tileIndex = spec.tileIndex
+                )
+            }
             val drainAnim = Animatable(0f)
             val exitAnim = Animatable(0f)
             launchTiles[spec.trigger] = spec.tileIndex
@@ -290,6 +310,11 @@ fun ArrowBoard(
                 val blockProgress = blockAnim.value.coerceIn(0f, 1f)
                 val flyingTiles = launchTiles.values.toSet()
                 drawPlate(metrics, state, flyingTiles)
+
+                // Tap pulses sit on the plate, under every arrow, so a pulse marks
+                // the spot an arrow left without washing out the one that is still
+                // there next to it.
+                launchAnimation.draw(this)
 
                 for (index in level.tiles.indices) {
                     val tile = level.tiles[index]
@@ -365,7 +390,8 @@ fun ArrowBoard(
                         metrics = metrics,
                         drain = drain,
                         exit = exit,
-                        flicker = flicker.value
+                        flicker = flicker.value,
+                        boost = launchAnimation.arrowGlowBoost(flyingIndex)
                     )
                 }
             }

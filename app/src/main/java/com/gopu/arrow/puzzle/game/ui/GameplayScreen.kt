@@ -63,6 +63,7 @@ import com.gopu.arrow.puzzle.game.ui.components.ArrowBoard
 import com.gopu.arrow.puzzle.game.ui.components.ArrowLaunch
 import com.gopu.arrow.puzzle.game.ui.components.DimOverlay
 import com.gopu.arrow.puzzle.game.ui.components.LivesRow
+import com.gopu.arrow.puzzle.game.ui.components.LaunchAnimationStyle
 import com.gopu.arrow.puzzle.game.ui.components.NeonActionButton
 import com.gopu.arrow.puzzle.game.ui.components.NeonChip
 import com.gopu.arrow.puzzle.game.ui.components.NeonIconButton
@@ -114,6 +115,11 @@ fun GameplayScreen(
     val haptics = rememberHaptics(hapticsEnabled)
     val soundEnabled by progressRepository.soundEnabled.collectAsState(initial = true)
     val sounds = rememberSounds(soundEnabled)
+    // Presentation only, and read at the moment an arrow is launched, so a change
+    // made from the settings overlay applies to the next tap without a restart and
+    // never reaches the reducer, the hit test or the clear condition.
+    val launchStyle by progressRepository.launchAnimation
+        .collectAsState(initial = LaunchAnimationStyle.Default)
     val rewardedAvailable by ads.rewardedAvailable.collectAsState(initial = false)
     val tutorialSeen by progressRepository.tutorialSeen.collectAsState(initial = false)
     val isIntroLevel = level.pack == 1 && level.order == 1
@@ -143,8 +149,13 @@ fun GameplayScreen(
     var winTileIndex by remember(level) { mutableStateOf(-1) }
 
     val totalArrows = level.tiles.size
-    val remaining = gameState.remainingTiles.size
-    val cleared = totalArrows - remaining
+    // remainingTiles holds board cells, not arrows: a bent arrow owns several.
+    // Count arrows that still have at least one cell left, or the counters
+    // below mix two units and go negative on any level with multi-cell arrows.
+    val remainingArrows = level.tiles.count { tile ->
+        tile.cells.any { it in gameState.remainingTiles }
+    }
+    val cleared = totalArrows - remainingArrows
     val progress by animateFloatAsState(
         targetValue = if (totalArrows == 0) 1f else cleared.toFloat() / totalArrows,
         animationSpec = tween(350),
@@ -281,7 +292,7 @@ fun GameplayScreen(
                     activeColor = NeonRed,
                     emptyColor = NeonPanel
                 )
-                NeonChip(label = "ARROWS", value = "$remaining")
+                NeonChip(label = "ARROWS", value = "$remainingArrows")
                 NeonChip(label = "MOVES", value = "$cleared", accent = NeonLime)
             }
 
@@ -346,6 +357,7 @@ fun GameplayScreen(
                         },
                         block = block,
                         launchArrow = departure,
+                        launchStyle = launchStyle,
                         onLaunchFinished = { finishedIndex ->
                             if (finishedIndex == winTileIndex) winExit?.complete(Unit)
                         },

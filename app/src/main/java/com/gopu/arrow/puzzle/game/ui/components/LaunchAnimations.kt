@@ -47,6 +47,10 @@ import kotlin.math.min
  * quadratic Bézier the tube is stroked from, so the head reaches a corner exactly
  * when the flow does and a bend is never jumped.
  *
+ * [boost] is extra glow handed in by whichever tap effect is playing: it lifts
+ * brightness only, through [ArrowShape]'s own energy ramp, and is zero whenever
+ * nothing is playing, so an unboosted launch is drawn exactly as before.
+ *
  * Once the front has reached the tip the entire arrow is a thin line, and [exit]
  * carries that line out along the board's own exit axis, dissolving the trail from
  * the tail forward so the head is the last thing to disappear.
@@ -59,7 +63,8 @@ internal fun DrawScope.drawLaunch(
     metrics: BoardMetrics,
     drain: Float,
     exit: Float,
-    flicker: Float
+    flicker: Float,
+    boost: Float = 0f
 ) {
 
     val length = curve.length
@@ -94,7 +99,7 @@ internal fun DrawScope.drawLaunch(
                 scope = this,
                 path = piece,
                 color = color,
-                glow = AheadGlow,
+                glow = AheadGlow + boost,
                 alpha = aheadAlphaAt(flow)
             )
         }
@@ -109,7 +114,7 @@ internal fun DrawScope.drawLaunch(
                 center = curve.pointAt(front),
                 tangent = curve.directionAt(front),
                 alpha = headLight,
-                glow = HeadGlow + 0.45f * leaving
+                glow = HeadGlow + 0.45f * leaving + boost
             )
         }
     }

@@ -3,6 +3,7 @@ package com.gopu.arrow.puzzle.game.data
 import android.content.Context
 import com.gopu.arrow.puzzle.game.PuzzleLevel
 import com.gopu.arrow.puzzle.game.levels.LevelRepository
+import com.gopu.arrow.puzzle.game.ui.components.LaunchAnimationStyle
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
@@ -14,6 +15,10 @@ class ProgressRepository(private val context: Context) {
     val soundEnabled: Flow<Boolean> = DataStoreHelper.observeSoundEnabled(context)
     val hapticsEnabled: Flow<Boolean> = DataStoreHelper.observeHapticsEnabled(context)
     val tutorialSeen: Flow<Boolean> = DataStoreHelper.observeTutorialSeen(context)
+
+    /** Which departure animation a newly launched arrow plays. Presentation only. */
+    val launchAnimation: Flow<LaunchAnimationStyle> =
+        DataStoreHelper.observeLaunchAnimation(context)
 
     suspend fun unlockLevel(levelId: String, stars: Int, levelOrder: Int) {
         val current = highestUnlockedLevel.first()
@@ -29,6 +34,9 @@ class ProgressRepository(private val context: Context) {
     suspend fun setSoundEnabled(enabled: Boolean) = DataStoreHelper.saveSoundEnabled(context, enabled)
     suspend fun setHapticsEnabled(enabled: Boolean) = DataStoreHelper.saveHapticsEnabled(context, enabled)
     suspend fun setTutorialSeen(seen: Boolean) = DataStoreHelper.saveTutorialSeen(context, seen)
+
+    suspend fun setLaunchAnimation(style: LaunchAnimationStyle) =
+        DataStoreHelper.saveLaunchAnimation(context, style)
 
     fun isLevelUnlocked(levelOrder: Int): Boolean = runBlocking { highestUnlockedLevel.first() >= levelOrder }
 }
