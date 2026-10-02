@@ -47,17 +47,23 @@ private enum class AppScreen { HOME, LEVEL_SELECT, GAMEPLAY, SETTINGS }
 
 private const val PACK_COUNT = 5
 
+/**
+ * Stand-in for pack-01-level-01 when the level assets cannot be read at all, so
+ * the game still starts on a legal, solvable board. It matches the shape of the
+ * real first level - 4x6 with ten arrows - and is trivially solvable: the two top
+ * rows leave upwards, then the bottom pair leaves downwards.
+ */
 private val FallbackLevel = PuzzleLevel(
     id = "pack-01-level-01",
     pack = 1,
     order = 1,
-    width = 3,
-    height = 5,
+    width = 4,
+    height = 6,
     tiles = buildList {
-        repeat(2) { row -> repeat(3) { column -> add(ArrowTile(BoardPosition(row, column), Direction.UP)) } }
-        repeat(3) { row -> repeat(3) { column -> add(ArrowTile(BoardPosition(row + 2, column), Direction.DOWN)) } }
+        repeat(2) { row -> repeat(4) { column -> add(ArrowTile(BoardPosition(row, column), Direction.UP)) } }
+        repeat(2) { column -> add(ArrowTile(BoardPosition(4, column), Direction.DOWN)) }
     },
-    parMoves = 15
+    parMoves = 10
 )
 
 /**

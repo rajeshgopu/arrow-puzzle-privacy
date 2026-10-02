@@ -149,51 +149,58 @@ class LevelGeneratorTest {
     /**
      * Board sizes mirror `tools/generate-levels.ps1`: portrait boards in the
      * same band as the gameplay play area, so the grid fills the plate instead
-     * of letterboxing inside it.
+     * of letterboxing inside it. The ramp is the same one the shipped levels
+     * were generated from - board size and arrow count both climb, the first pack
+     * stays small and easy, and the last two packs are dense enough to need long
+     * bodies to fill the board.
      */
     private fun configFor(pack: Int, order: Int): PuzzleGeneratorConfig {
         val id = "pack-0$pack-level-${String.format("%02d", order)}"
-        // Ramp board size, arrow count and longest body across the packs, and
-        // nudge each within a pack, so difficulty climbs level by level.
-        return when (pack) {
-            2 -> if (order <= 3) {
-                PuzzleGeneratorConfig(
-                    width = 4, height = 7, arrowCount = 9 + order,
-                    maxBodyCells = 2 + (order - 1) / 6, id = id, pack = pack, order = order
-                )
-            } else {
-                PuzzleGeneratorConfig(
-                    width = 5, height = 8, arrowCount = 13 + order,
-                    maxBodyCells = 2 + (order - 1) / 4, id = id, pack = pack, order = order
-                )
-            }
-            3 -> if (order <= 4) {
-                PuzzleGeneratorConfig(
-                    width = 5, height = 8, arrowCount = 13 + order,
-                    maxBodyCells = 2 + (order - 1) / 4, id = id, pack = pack, order = order
-                )
-            } else {
-                PuzzleGeneratorConfig(
-                    width = 5, height = 9, arrowCount = 15 + order,
-                    maxBodyCells = 3 + (order - 1) / 6, id = id, pack = pack, order = order
-                )
-            }
-            4 -> if (order <= 3) {
-                PuzzleGeneratorConfig(
-                    width = 5, height = 9, arrowCount = 15 + order,
-                    maxBodyCells = 3 + (order - 1) / 6, id = id, pack = pack, order = order
-                )
-            } else {
-                PuzzleGeneratorConfig(
-                    width = 6, height = 10, arrowCount = 17 + order,
-                    maxBodyCells = 3 + (order - 1) / 4, id = id, pack = pack, order = order
-                )
-            }
-            else -> PuzzleGeneratorConfig(
-                width = 7, height = 11, arrowCount = 23 + order,
-                maxBodyCells = 3 + (order - 1) / 4, id = id, pack = pack, order = order
-            )
-        }
+        val step = (pack - 1) * 10 + order
+        // One entry per level in play order: columns, rows, arrow count. The
+        // table is the difficulty curve, so it is spelled out rather than
+        // computed, exactly as the generator spells it out.
+        val ramp = listOf(
+            // 1-10: pack 1, the tutorial ramp. Ten arrows on a small board with
+            // room between them, up to eighteen on a slightly larger one.
+            Triple(4, 6, 10), Triple(4, 6, 11), Triple(4, 7, 12), Triple(4, 7, 13), Triple(4, 7, 14),
+            Triple(5, 8, 15), Triple(5, 8, 16), Triple(5, 8, 17), Triple(5, 8, 17), Triple(5, 8, 18),
+            // 11-20: pack 2, medium. Bigger boards, more arrows, longer bodies
+            // start appearing once there is somewhere to put them.
+            Triple(5, 9, 19), Triple(5, 9, 20), Triple(6, 10, 21), Triple(6, 10, 22), Triple(6, 10, 23),
+            Triple(6, 10, 24), Triple(6, 11, 25), Triple(6, 11, 26), Triple(6, 11, 27), Triple(6, 11, 28),
+            // 21-30: pack 3, medium into hard. Thirty-odd arrows on 7-wide boards.
+            Triple(7, 12, 29), Triple(7, 12, 30), Triple(7, 12, 31), Triple(7, 12, 32), Triple(7, 12, 33),
+            Triple(7, 13, 34), Triple(7, 13, 35), Triple(7, 13, 36), Triple(7, 13, 37), Triple(7, 13, 38),
+            // 31-40: pack 4, hard. Dense 8-wide boards, long arrows.
+            Triple(8, 14, 38), Triple(8, 14, 39), Triple(8, 14, 40), Triple(8, 14, 41), Triple(8, 14, 42),
+            Triple(8, 14, 43), Triple(8, 14, 44), Triple(8, 14, 45), Triple(8, 14, 46), Triple(8, 14, 46),
+            // 41-50: pack 5, the hard end.
+            Triple(8, 14, 47), Triple(8, 14, 47), Triple(8, 14, 48), Triple(8, 14, 49), Triple(8, 14, 49),
+            Triple(8, 14, 50), Triple(8, 14, 50), Triple(8, 14, 50), Triple(8, 14, 50), Triple(8, 14, 50)
+        )
+        val entry = ramp[step - 1]
+        val columns = entry.first
+        val rows = entry.second
+        val arrows = entry.third
+
+        // Longest body a grown arrow may reach. The generator derives this from
+        // the level's occupancy target; levels that want less than about two
+        // cells per arrow get a four-cell ceiling, and everything above that gets
+        // five so the dense packs still thread long arrows through the board.
+        val cells = columns * rows
+        val avgBody = cells.toDouble() / arrows
+        val maxBodyCells = if (avgBody < 1.9) 4 else 5
+
+        return PuzzleGeneratorConfig(
+            width = columns,
+            height = rows,
+            arrowCount = arrows,
+            maxBodyCells = maxBodyCells,
+            id = id,
+            pack = pack,
+            order = order
+        )
     }
 
     private fun levelsDirectory(): File {
