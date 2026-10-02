@@ -27,6 +27,14 @@ interface AdController {
      */
     fun createBannerView(context: Context): View?
 
+    /**
+     * Height in dp the view from [createBannerView] will occupy on this device,
+     * or null when no banner can be sized. A screen that cannot afford to
+     * resize reserves exactly this and pins its view to it, so a late fill
+     * cannot move anything around it.
+     */
+    fun bannerHeight(context: Context): Int?
+
     /** Show a full-screen interstitial. Resolves once the attempt is done. */
     suspend fun showInterstitial()
 
@@ -40,6 +48,7 @@ object NoAds : AdController {
     override val bannerAvailable: StateFlow<Boolean> = MutableStateFlow(false).asStateFlow()
     override val rewardedAvailable: StateFlow<Boolean> = MutableStateFlow(false).asStateFlow()
     override fun createBannerView(context: Context): View? = null
+    override fun bannerHeight(context: Context): Int? = null
     override suspend fun showInterstitial() = Unit
     override suspend fun showRewarded(): Boolean = false
 }

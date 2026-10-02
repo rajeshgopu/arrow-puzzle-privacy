@@ -3,6 +3,7 @@ package com.gopu.arrow.puzzle.game.ads
 import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
+import android.content.pm.PackageManager
 import android.util.Log
 import android.view.View
 import com.google.android.gms.ads.AdListener
@@ -29,6 +30,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
+import kotlin.math.roundToInt
 
 /**
  * Real AdMob-backed provider. Nothing is requested until [AdConsent] reports
@@ -65,6 +67,7 @@ class AdMobController(
     init {
         scope.launch {
             AdConsent.canRequestAds.filter { it }.first()
+            Log.i(Tag, "Consent allows ads; initializing MobileAds (appId=${admobAppId(context)})")
             runCatching {
                 MobileAds.initialize(context) {
                     Log.i(Tag, "MobileAds initialized")
@@ -117,14 +120,35 @@ class AdMobController(
         }
     }
 
+    override fun bannerHeight(context: Context): Int? {
+        val height = runCatching { bannerSize(context).height }.getOrNull()
+        Log.i(Tag, "Reserved banner band: ${height ?: "unavailable"}")
+        return height
+    }
+
+    /*
+     * The one place a banner size is decided, so the height a screen reserves
+     * and the height the view actually takes cannot disagree.
+     *
+     * The width argument is in dp, not pixels. Feeding it `widthPixels` looks
+     * plausible and is wrong: the SDK then builds a creative as wide as the
+     * raw pixel count and refuses the request with "Ad size will not fit on
+     * screen", so the banner never loads at all.
+     */
+    private fun bannerSize(context: Context): AdSize {
+        val metrics = context.resources.displayMetrics
+        val widthDp = (metrics.widthPixels / metrics.density).roundToInt()
+        return AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(context, widthDp)
+    }
+
     override fun createBannerView(context: Context): View {
         val adView = AdView(context)
         adView.adUnitId = bannerUnitId
-        adView.setAdSize(
-            AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(
-                context,
-                context.resources.displayMetrics.widthPixels
-            )
+        val size = bannerSize(context)
+        adView.setAdSize(size)
+        Log.i(
+            Tag,
+            "Banner view created: unit=$bannerUnitId size=${size.width}x${size.height}dp"
         )
         adView.setAdListener(object : AdListener() {
             override fun onAdLoaded() {
@@ -215,6 +239,19 @@ fun Context.findActivity(): Activity? {
     }
     return null
 }
+
+/**
+ * The AdMob app ID actually baked into the merged manifest. Logged at startup
+ * because the failure that costs the most time is a test app ID paired with
+ * production ad units (or the reverse), which the SDK refuses silently.
+ */
+private fun admobAppId(context: Context): String? = runCatching {
+    val info = context.packageManager.getApplicationInfo(
+        context.packageName,
+        PackageManager.GET_META_DATA
+    )
+    info.metaData?.getString("com.google.android.gms.ads.APPLICATION_ID")
+}.getOrNull()
 
 private const val Tag = "Ads"
 

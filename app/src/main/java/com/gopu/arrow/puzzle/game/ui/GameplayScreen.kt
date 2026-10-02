@@ -55,6 +55,7 @@ import com.gopu.arrow.puzzle.game.PuzzleReducer
 import com.gopu.arrow.puzzle.game.step
 import com.gopu.arrow.puzzle.game.ads.AdHost
 import com.gopu.arrow.puzzle.game.ads.NoAds
+import com.gopu.arrow.puzzle.game.ads.ReservedBannerAdSlot
 import com.gopu.arrow.puzzle.game.data.ProgressRepository
 import com.gopu.arrow.puzzle.game.levels.LEVELS_PER_PACK
 import com.gopu.arrow.puzzle.game.starsForInvalidTaps
@@ -456,6 +457,17 @@ fun GameplayScreen(
                 )
             }
             Spacer(Modifier.height(2.dp))
+
+            /*
+             * The banner is the last child of the column, below the HINT row,
+             * so it sits furthest from the board - the one big tap target on
+             * this screen - and the HINT and Restart controls keep their place
+             * whatever the ad does. The band is reserved up front and never
+             * resizes, so a banner that fills late cannot shrink the board
+             * under the player's fingers; it only costs the board the height
+             * once, for the whole level.
+             */
+            ReservedBannerAdSlot(adHost = ads)
         }
 
         AnimatedVisibility(

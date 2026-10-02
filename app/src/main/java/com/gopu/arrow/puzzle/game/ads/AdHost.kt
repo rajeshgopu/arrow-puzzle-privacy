@@ -28,6 +28,12 @@ class AdHost(
     /** Creates the banner view for a slot, or null when ads are not available. */
     fun createBannerView(context: Context): View? = controller.createBannerView(context)
 
+    /**
+     * Height in dp that banner view will occupy, or null when none can be
+     * sized. A slot that must not resize reserves exactly this.
+     */
+    fun bannerHeight(context: Context): Int? = controller.bannerHeight(context)
+
     /** Called once when a level is completed; shows a paced interstitial. */
     suspend fun onLevelCompleted() {
         completionsSinceInterstitial += 1
