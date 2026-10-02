@@ -94,6 +94,44 @@ val NeonTextDim = Color(0xFF9AA3D4)
 val NeonPanel = Color(0xFF15152E)
 val NeonPanelSoft = Color(0xFF1E1E3E)
 
+/* Level select: a near-white page with six pastel card gradients.
+   Nothing here is saturated, so the gold stars stay the loudest thing on the
+   screen and the navy headings keep the hierarchy readable. */
+
+/** Page field behind the frosted plates. */
+val BackdropTop = Color(0xFFFBFCFF)
+val BackdropMid = Color(0xFFF4F7FD)
+val BackdropBottom = Color(0xFFEDF2FB)
+
+/** Deep blue headings and the softer tone used for supporting copy. */
+val NavyInk = Color(0xFF18234F)
+val NavyMuted = Color(0xFF6A74A3)
+
+/** Title accent: the gradient the LEVEL wordmark runs through. */
+val AccentViolet = Color(0xFF7B5CFF)
+val AccentAzure = Color(0xFF31A9FF)
+
+/** Pack progress bar fill. */
+val ProgressGreenSoft = Color(0xFF86E7BC)
+val ProgressGreen = Color(0xFF3ED598)
+
+/** Locked level plate: flat, desaturated, deliberately the dullest card. */
+val LockedGlassTop = Color(0xFFE9EDF6)
+val LockedGlassBottom = Color(0xFFDCE2EF)
+
+/**
+ * Six soft pastel pairs (top, bottom) that rotate across a pack's level grid,
+ * so ten cards read as a varied set without any single card shouting.
+ */
+val LevelCardPalettes: List<List<Color>> = listOf(
+    listOf(Color(0xFFC8F3E0), Color(0xFF8FE4C4)), // mint
+    listOf(Color(0xFFD2E9FC), Color(0xFFA6D6F5)), // sky
+    listOf(Color(0xFFFFE9D2), Color(0xFFFFCF9F)), // peach
+    listOf(Color(0xFFE7DBFD), Color(0xFFCBB9F7)), // lilac
+    listOf(Color(0xFFFFDFEB), Color(0xFFFFC1DA)), // rose
+    listOf(Color(0xFFD0F2F4), Color(0xFFA1E6EC))  // aqua
+)
+
 private val ArrowColorScheme = lightColorScheme(
     primary = Coral,
     onPrimary = Color.White,
