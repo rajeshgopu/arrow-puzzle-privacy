@@ -2,9 +2,9 @@
 <resources>
     <color name="ic_launcher_background">#FAF3E2</color>
     <!--
-      Top stop of the menu backdrop gradient (theme IvoryTop). The window paints
-      this before Compose has a frame, so the launch starts on the same ivory the
+      Top stop of the menu backdrop gradient (theme MenuSkyTop). The window paints
+      this before Compose has a frame, so the launch starts on the same sky the
       splash draws and the menu ends on instead of flashing the platform white.
     -->
-    <color name="launch_field">#FAFBF5</color>
+    <color name="launch_field">#A6B0F8</color>
 </resources>

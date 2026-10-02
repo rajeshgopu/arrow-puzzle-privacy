@@ -34,34 +34,86 @@ val FlameYellow = Color(0xFFFFC107)
 val BoardDark = Color(0xFF0B222B)
 val BoardCell = Color(0xFF123A46)
 
-/* Premium light menu palette.
-   The menu keeps a warm ivory field with almost no colour in it, so the
-   wordmark gradients, the cyan hero arrow and the coral action button carry
-   every accent on the screen. */
-val Ivory = Color(0xFFF4F5EE)
-val IvoryTop = Color(0xFFFAFBF5)
-val IvoryBottom = Color(0xFFE9ECDF)
+/* Menu palette: a violet-indigo sky that falls away to a deep blue floor.
+   The field is the only dark mass on the screen, so the gold wordmark, the
+   glossy arrow cubes and the orange action pill are the only things competing
+   for attention, and every one of them is light on dark. */
+val MenuSkyTop = Color(0xFFA6B0F8)
+val MenuSkyMid = Color(0xFF6C77E2)
+val MenuSkyFloor = Color(0xFF3A45B6)
+val MenuSkyDeep = Color(0xFF1B1F66)
 
-/** Wordmark: ARROW runs charcoal into rust, PUZZLE coral into gold. */
-val CharcoalDeep = Color(0xFF23242E)
-val Rust = Color(0xFF8C3A22)
-val Ember = Color(0xFFFF6A3D)
-val AmberGold = Color(0xFFFFA62B)
+/** Wordmark. ARROW is lit gold, PUZZLE lit ice, both on a cocoa outline. */
+val MarkGoldTop = Color(0xFFFFF1C0)
+val MarkGold = Color(0xFFFFC53A)
+val MarkGoldDeep = Color(0xFFEE9008)
+val MarkIceTop = Color(0xFFFFFFFF)
+val MarkIce = Color(0xFFDDECFF)
+val MarkIceDeep = Color(0xFF9BC1F7)
+val MarkOutline = Color(0xFF7C3C10)
+val MarkExtrude = Color(0xFF52270A)
 
-/** Menu text. Dark blue-teal for headings, a softer tone for supporting copy. */
+/** Glossy arrow cubes: top facet, face, and the shaded side underneath it. */
+val TileCyanLight = Color(0xFF8CEBFF)
+val TileCyan = Color(0xFF15BFEC)
+val TileCyanDeep = Color(0xFF0789C4)
+val TileGreenLight = Color(0xFF8BF78A)
+val TileGreen = Color(0xFF2FC44E)
+val TileGreenDeep = Color(0xFF11842B)
+val TileRedLight = Color(0xFFFFA797)
+val TileRed = Color(0xFFF0402F)
+val TileRedDeep = Color(0xFFA31910)
+val TileYellowLight = Color(0xFFFFE48F)
+val TileYellow = Color(0xFFFFB627)
+val TileYellowDeep = Color(0xFFC5760A)
+val TileAzureLight = Color(0xFF9FD4FF)
+val TileAzure = Color(0xFF2E86F0)
+val TileAzureDeep = Color(0xFF1455B0)
+val TileVioletLight = Color(0xFFCBAAFF)
+val TileViolet = Color(0xFF8B4CF0)
+val TileVioletDeep = Color(0xFF5A21A8)
+
+/**
+ * The carved slab the brand sits on at launch: the sunlit top of the wood, the
+ * face of it, and the two darker steps the bevel is cut back to. The plaque is
+ * the only brown mass in the game, so it reads as its own object against the
+ * sky rather than as part of the wordmark.
+ */
+val PlankTop = Color(0xFFC79257)
+val PlankFace = Color(0xFF9A6634)
+val PlankDeep = Color(0xFF6B4020)
+val PlankEdge = Color(0xFF3F2310)
+
+/** The plain cubes of the menu board: lit top, face, shaded side. */
+val CubeTop = Color(0xFFF4F7FF)
+val CubeFace = Color(0xFFC8D2F3)
+val CubeSide = Color(0xFF97A3D5)
+
+/** Planting along the bottom of the menu field and behind the wordmark. */
+val LeafDeep = Color(0xFF12401F)
+val LeafMid = Color(0xFF2E7A3A)
+val LeafLight = Color(0xFF63B85C)
+
+/** Menu text: pale on the dark field, with a darker pair for the light screens. */
+val MenuText = Color(0xFFFFFFFF)
+val MenuTextDim = Color(0xFFC3D0FF)
 val TealInk = Color(0xFF0F3B45)
 val TealMuted = Color(0xFF5F828A)
 
-/** Hero arrow: light facet, body, shaded facet and the 3D edge underneath it. */
-val HeroCyanLight = Color(0xFF6FE6F8)
-val HeroCyan = Color(0xFF23D2EF)
-val HeroCyanDeep = Color(0xFF0B93B4)
-val HeroCyanEdge = Color(0xFF05697F)
+/** Glass plates, their rim, and the glow the settings disc sits in. */
+val GlassTop = Color(0x8FDCE9FF)
+val GlassMid = Color(0x4A7FA8F0)
+val GlassDeep = Color(0x662B3E96)
+val GlassRim = Color(0xB8E8F2FF)
+val DiscLight = Color(0xFF63C6FF)
+val DiscFace = Color(0xFF1E6BE0)
+val DiscDeep = Color(0xFF0B3C9B)
 
-/** Primary action gradient, star accent and card surface. */
-val PlayTop = Color(0xFFFF7A45)
-val PlayMid = Color(0xFFFF5A33)
-val PlayBottom = Color(0xFFEE4526)
+/** Primary action gradient and its 3D underside. */
+val PlayTop = Color(0xFFFFC93B)
+val PlayMid = Color(0xFFFF8A12)
+val PlayBottom = Color(0xFFFF5E00)
+val PlayEdge = Color(0xFFB83600)
 val StarGold = Color(0xFFF6B93B)
 val CardSurface = Color(0xFFFCFDF8)
 
@@ -143,11 +195,11 @@ private val ArrowColorScheme = lightColorScheme(
     onSecondaryContainer = TileBlueDark,
     tertiary = Mint,
     onTertiary = Ink,
-    background = Ivory,
-    onBackground = TealInk,
+    background = MenuSkyTop,
+    onBackground = MenuText,
     surface = CardSurface,
     onSurface = TealInk,
-    surfaceVariant = IvoryBottom,
+    surfaceVariant = MenuSkyDeep,
     onSurfaceVariant = TealMuted,
     outline = TealInk.copy(alpha = 0.18f)
 )

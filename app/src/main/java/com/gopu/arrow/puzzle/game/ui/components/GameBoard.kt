@@ -34,7 +34,6 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.graphics.drawscope.scale
 import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
@@ -957,53 +956,4 @@ private fun shakeOffset(progress: Float, unit: Float): Float {
 private fun smoothStep(from: Float, to: Float, value: Float): Float {
     if (to - from < 0.0001f) return if (value >= to) 1f else 0f
     return ((value - from) / (to - from)).coerceIn(0f, 1f)
-}
-
-/**
- * A standalone arrow glyph (used by Home/Splash). Straight arrows and the
- * arrowhead of bent arrows share this geometry.
- */
-@Composable
-fun ArrowMark(
-    modifier: Modifier,
-    direction: Direction = Direction.RIGHT,
-    color: Color = Color.White,
-    glow: Boolean = false
-) {
-    Canvas(modifier = modifier) {
-        val path = buildArrowPath(direction)
-        if (glow) {
-            val pivot = Offset(size.width / 2f, size.height / 2f)
-            for (ring in 3 downTo 1) {
-                scale(1f + ring * 0.07f, pivot) {
-                    drawPath(path, color.copy(alpha = 0.12f))
-                }
-            }
-        }
-        drawPath(path, color)
-    }
-}
-
-private fun DrawScope.buildArrowPath(direction: Direction): Path {
-    val center = Offset(size.width / 2f, size.height / 2f)
-    val shaft = size.minDimension * 0.30f
-    val head = size.minDimension * 0.22f
-    val path = Path()
-
-    fun point(x: Float, y: Float): Offset = when (direction) {
-        Direction.RIGHT -> Offset(center.x + x, center.y + y)
-        Direction.LEFT -> Offset(center.x - x, center.y + y)
-        Direction.UP -> Offset(center.x + y, center.y - x)
-        Direction.DOWN -> Offset(center.x + y, center.y + x)
-    }
-
-    path.moveTo(point(-shaft, -head / 2f).x, point(-shaft, -head / 2f).y)
-    path.lineTo(point(shaft * 0.35f, -head / 2f).x, point(shaft * 0.35f, -head / 2f).y)
-    path.lineTo(point(shaft * 0.35f, -head).x, point(shaft * 0.35f, -head).y)
-    path.lineTo(point(shaft, 0f).x, point(shaft, 0f).y)
-    path.lineTo(point(shaft * 0.35f, head).x, point(shaft * 0.35f, head).y)
-    path.lineTo(point(shaft * 0.35f, head / 2f).x, point(shaft * 0.35f, head / 2f).y)
-    path.lineTo(point(-shaft, head / 2f).x, point(-shaft, head / 2f).y)
-    path.close()
-    return path
 }

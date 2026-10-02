@@ -40,31 +40,51 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.clipPath
+import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.gopu.arrow.puzzle.game.ui.theme.AmberGold
-import com.gopu.arrow.puzzle.game.ui.theme.CardSurface
-import com.gopu.arrow.puzzle.game.ui.theme.CharcoalDeep
 import com.gopu.arrow.puzzle.game.ui.theme.Cloud
 import com.gopu.arrow.puzzle.game.ui.theme.Coral
-import com.gopu.arrow.puzzle.game.ui.theme.DisplaySerif
-import com.gopu.arrow.puzzle.game.ui.theme.Ember
+import com.gopu.arrow.puzzle.game.ui.theme.DiscDeep
+import com.gopu.arrow.puzzle.game.ui.theme.DiscFace
+import com.gopu.arrow.puzzle.game.ui.theme.DiscLight
+import com.gopu.arrow.puzzle.game.ui.theme.GlassDeep
+import com.gopu.arrow.puzzle.game.ui.theme.GlassMid
+import com.gopu.arrow.puzzle.game.ui.theme.GlassRim
+import com.gopu.arrow.puzzle.game.ui.theme.GlassTop
 import com.gopu.arrow.puzzle.game.ui.theme.Gold
 import com.gopu.arrow.puzzle.game.ui.theme.Ink
 import com.gopu.arrow.puzzle.game.ui.theme.InkSoft
+import com.gopu.arrow.puzzle.game.ui.theme.MarkExtrude
+import com.gopu.arrow.puzzle.game.ui.theme.MarkGold
+import com.gopu.arrow.puzzle.game.ui.theme.MarkGoldDeep
+import com.gopu.arrow.puzzle.game.ui.theme.MarkGoldTop
+import com.gopu.arrow.puzzle.game.ui.theme.MarkIce
+import com.gopu.arrow.puzzle.game.ui.theme.MarkIceDeep
+import com.gopu.arrow.puzzle.game.ui.theme.MarkIceTop
+import com.gopu.arrow.puzzle.game.ui.theme.MarkOutline
+import com.gopu.arrow.puzzle.game.ui.theme.MenuTextDim
 import com.gopu.arrow.puzzle.game.ui.theme.NeonCore
 import com.gopu.arrow.puzzle.game.ui.theme.NeonCyan
 import com.gopu.arrow.puzzle.game.ui.theme.NeonMagenta
@@ -73,166 +93,396 @@ import com.gopu.arrow.puzzle.game.ui.theme.NeonPanelSoft
 import com.gopu.arrow.puzzle.game.ui.theme.NeonText
 import com.gopu.arrow.puzzle.game.ui.theme.NeonTextDim
 import com.gopu.arrow.puzzle.game.ui.theme.PlayBottom
+import com.gopu.arrow.puzzle.game.ui.theme.PlayEdge
 import com.gopu.arrow.puzzle.game.ui.theme.PlayMid
 import com.gopu.arrow.puzzle.game.ui.theme.PlayTop
-import com.gopu.arrow.puzzle.game.ui.theme.Rust
-import com.gopu.arrow.puzzle.game.ui.theme.StarGold
-import com.gopu.arrow.puzzle.game.ui.theme.TealInk
-import com.gopu.arrow.puzzle.game.ui.theme.TealMuted
 import com.gopu.arrow.puzzle.game.ui.theme.UiSans
 import kotlinx.coroutines.delay
+import kotlin.math.cos
+import kotlin.math.min
+import kotlin.math.sin
 
 /**
- * Two-line ARROW PUZZLE wordmark used on the splash and menu screens.
+ * The two lines of the ARROW PUZZLE wordmark and the gradient each face runs
+ * through: ARROW is lit gold, PUZZLE lit ice, so the mark reads as one carved
+ * object rather than as two differently coloured words.
+ */
+private val MarkLines = listOf(
+    "ARROW" to listOf(MarkGoldTop, MarkGold, MarkGoldDeep),
+    "PUZZLE" to listOf(MarkIceTop, MarkIce, MarkIceDeep)
+)
+
+/** The eight compass directions the outline is stamped out in. */
+private val OutlineRing = listOf(
+    1f to 0f,
+    0.7071f to 0.7071f,
+    0f to 1f,
+    -0.7071f to 0.7071f,
+    -1f to 0f,
+    -0.7071f to -0.7071f,
+    0f to -1f,
+    0.7071f to -0.7071f
+)
+
+/**
+ * The ARROW PUZZLE logotype: a chunky, toy-like wordmark rather than UI copy.
  *
- * Both lines are set in Playfair Display Bold: ARROW fades from deep charcoal
- * into rust, PUZZLE from coral into gold, so the wordmark reads as a logo rather
- * than as UI copy. Tracking and line height are driven off [fontSize] to keep
- * the two lines tight and optically centred at any size.
+ * Each line is stamped eight times in the cocoa outline colour, once per compass
+ * offset, which dilates the glyph into an even border; three more passes in a
+ * darker brown step down and to the right for the extruded edge; then the face
+ * once, in its own vertical gradient. It is measured through
+ * [rememberTextMeasurer] and drawn into a single canvas, so the mark costs two
+ * text layouts, never reflows, and stays crisp at any size.
  */
 @Composable
 fun Wordmark(
     modifier: Modifier = Modifier,
     fontSize: Int = 52,
-    tracking: Float = 0.05f
+    tracking: Float = -0.015f
 ) {
-    val base = TextStyle(
-        fontFamily = DisplaySerif,
-        fontWeight = FontWeight.Bold,
-        fontSize = fontSize.sp,
-        letterSpacing = (fontSize * tracking).sp,
-        lineHeight = (fontSize * 0.98f).sp
-    )
+    val measurer = rememberTextMeasurer()
 
-    Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(
-            text = "ARROW",
-            style = base.copy(
-                brush = Brush.verticalGradient(listOf(CharcoalDeep, Rust))
-            )
-        )
-        Text(
-            text = "PUZZLE",
-            style = base.copy(
-                brush = Brush.verticalGradient(listOf(Ember, AmberGold))
-            )
-        )
-    }
-}
+    Canvas(modifier) {
+        val unit = fontSize.sp.toPx()
+        val step = unit * MarkLineStep
+        val outline = unit * 0.082f
+        val extrude = unit * 0.085f
 
-/**
- * Menu stat card: small tracked label over a much larger number, on an
- * off-white card with a soft, slightly cool shadow.
- */
-@Composable
-fun ProgressCard(
-    label: String,
-    value: String,
-    modifier: Modifier = Modifier,
-    showStar: Boolean = false
-) {
-    val shape = RoundedCornerShape(20.dp)
+        val metrics = MarkLines.map { line ->
+            measurer.measure(line.first, MarkStyle(fontSize, tracking))
+        }
+        val blockHeight = step * (metrics.size - 1) + metrics.last().size.height
+        val top = ((size.height - blockHeight) / 2f).coerceAtLeast(0f)
 
-    Surface(
-        shape = shape,
-        color = CardSurface,
-        modifier = modifier.shadow(
-            elevation = 10.dp,
-            shape = shape,
-            ambientColor = TealInk.copy(alpha = 0.10f),
-            spotColor = TealInk.copy(alpha = 0.16f)
-        )
-    ) {
-        Column(
-            modifier = Modifier.padding(horizontal = 22.dp, vertical = 14.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = label,
-                color = TealMuted,
-                fontFamily = UiSans,
-                fontSize = 11.sp,
-                fontWeight = FontWeight.SemiBold,
-                letterSpacing = 2.4.sp
-            )
-            Spacer(Modifier.height(6.dp))
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    text = value,
-                    color = TealInk,
-                    fontFamily = UiSans,
-                    fontSize = 30.sp,
-                    fontWeight = FontWeight.ExtraBold,
-                    letterSpacing = (-0.5).sp
+        val layouts = MarkLines.mapIndexed { index, line ->
+            measurer.measure(
+                text = line.first,
+                style = MarkStyle(fontSize, tracking).copy(
+                    brush = Brush.verticalGradient(
+                        colors = line.second,
+                        startY = index * step,
+                        endY = (index + 1) * step
+                    )
                 )
-                if (showStar) {
-                    Spacer(Modifier.width(7.dp))
-                    Icon(
-                        imageVector = Icons.Filled.Star,
-                        contentDescription = null,
-                        tint = StarGold,
-                        modifier = Modifier.size(21.dp)
+            )
+        }
+
+        val extrusions = listOf(
+            Offset(extrude * 0.90f, extrude * 0.50f),
+            Offset(extrude * 0.50f, extrude * 0.85f),
+            Offset(0f, extrude * 1.05f)
+        )
+
+        // The face gradients are laid out in the mark's own space, so the whole
+        // block is drawn inside one translation instead of moving the brushes.
+        translate(0f, top) {
+            for ((index, layout) in layouts.withIndex()) {
+                val left = (size.width - layout.size.width) / 2f
+                val lineTop = index * step
+
+                for (offset in extrusions) {
+                    drawText(
+                        textLayoutResult = layout,
+                        color = MarkExtrude,
+                        topLeft = Offset(left + offset.x, lineTop + offset.y)
                     )
                 }
+                for ((dx, dy) in OutlineRing) {
+                    drawText(
+                        textLayoutResult = layout,
+                        color = MarkOutline,
+                        topLeft = Offset(left + dx * outline, lineTop + dy * outline)
+                    )
+                }
+                drawText(textLayoutResult = layout, topLeft = Offset(left, lineTop))
             }
         }
     }
 }
 
+/** The shared text style behind every line of the wordmark. */
+private fun MarkStyle(fontSize: Int, tracking: Float): TextStyle = TextStyle(
+    fontFamily = UiSans,
+    fontWeight = FontWeight.ExtraBold,
+    fontSize = fontSize.sp,
+    letterSpacing = (fontSize * tracking).sp,
+    lineHeight = (fontSize * MarkLineStep).sp
+)
+
 /**
- * Small rounded-square glass button for the menu corner. White plate, hairline
- * border, top sheen and an ambient shadow, which is all the depth it needs.
+ * Line advance as a fraction of the display size. Under one, so the two lines
+ * overlap slightly and the mark reads as one carved object.
+ */
+private const val MarkLineStep = 0.84f
+
+/** The badge a stat card carries: the crown on level, the star on stars. */
+enum class StatBadge { CROWN, STAR }
+
+/**
+ * A frosted blue plate carrying one number: badge on the left, label over value
+ * on the right. The plate is a vertical glass gradient with a white rim and a
+ * sheen across its top half, and the value is shadowed in deep blue so it keeps
+ * its edge against the sky behind it.
  */
 @Composable
-fun GlassIconButton(
+fun GlassStatCard(
+    label: String,
+    value: String,
+    badge: StatBadge,
+    modifier: Modifier = Modifier
+) {
+    val shape = RoundedCornerShape(24.dp)
+    val density = LocalDensity.current
+
+    Box(
+        modifier = modifier
+            .height(84.dp)
+            .clip(shape)
+            .background(
+                Brush.verticalGradient(
+                    0f to GlassTop,
+                    0.45f to GlassMid,
+                    1f to GlassDeep
+                )
+            )
+            .border(1.5.dp, GlassRim, shape)
+    ) {
+        Box(
+            modifier = Modifier
+                .matchParentSize()
+                .background(
+                    Brush.verticalGradient(
+                        0f to Color.White.copy(alpha = 0.26f),
+                        0.55f to Color.Transparent
+                    )
+                )
+        )
+
+        Row(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 14.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            StatBadgeIcon(badge = badge, modifier = Modifier.size(38.dp))
+            Spacer(Modifier.width(12.dp))
+            Column {
+                Text(
+                    text = label,
+                    color = MenuTextDim,
+                    fontFamily = UiSans,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    letterSpacing = 2.6.sp
+                )
+                Spacer(Modifier.height(1.dp))
+                Text(
+                    text = value,
+                    color = Color.White,
+                    fontFamily = UiSans,
+                    fontSize = 29.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    letterSpacing = (-0.5).sp,
+                    style = TextStyle(
+                        shadow = Shadow(
+                            color = DiscDeep.copy(alpha = 0.85f),
+                            offset = Offset(0f, with(density) { 2.dp.toPx() }),
+                            blurRadius = 0f
+                        )
+                    )
+                )
+            }
+        }
+    }
+}
+
+/** The gold badge on a stat card: a carved crown, or a faceted star. */
+@Composable
+private fun StatBadgeIcon(badge: StatBadge, modifier: Modifier = Modifier) {
+    Canvas(modifier) {
+        val edge = min(size.width, size.height)
+        val center = Offset(size.width / 2f, size.height / 2f)
+
+        drawCircle(
+            brush = Brush.radialGradient(
+                colorStops = arrayOf(
+                    0f to Color.White.copy(alpha = 0.38f),
+                    1f to Color.Transparent
+                ),
+                center = center,
+                radius = edge * 0.54f
+            ),
+            radius = edge * 0.54f,
+            center = center
+        )
+
+        // The outline is built in absolute pixels about the centre of the plate,
+        // so nothing depends on a transform pivot to land where it is meant to.
+        val path = Path().apply {
+            when (badge) {
+                StatBadge.CROWN -> {
+                    moveTo(center.x - 0.42f * edge, center.y + 0.28f * edge)
+                    lineTo(center.x - 0.48f * edge, center.y - 0.14f * edge)
+                    lineTo(center.x - 0.22f * edge, center.y + 0.05f * edge)
+                    lineTo(center.x, center.y - 0.32f * edge)
+                    lineTo(center.x + 0.22f * edge, center.y + 0.05f * edge)
+                    lineTo(center.x + 0.48f * edge, center.y - 0.14f * edge)
+                    lineTo(center.x + 0.42f * edge, center.y + 0.28f * edge)
+                }
+                StatBadge.STAR -> {
+                    for (point in 0 until 10) {
+                        val angle = (-Math.PI / 2.0 + point * Math.PI / 5.0).toFloat()
+                        val reach = if (point % 2 == 0) 0.48f else 0.22f
+                        val x = center.x + cos(angle) * reach * edge
+                        val y = center.y + sin(angle) * reach * edge
+                        if (point == 0) moveTo(x, y) else lineTo(x, y)
+                    }
+                }
+            }
+            close()
+        }
+
+        // Painted twice: a dark pass dropped a few pixels for its carved edge,
+        // then the lit face over the top of it.
+        val from = center.y - edge * 0.5f
+        val to = center.y + edge * 0.5f
+        translate(0f, edge * 0.06f) {
+            drawPath(
+                path = path,
+                brush = Brush.verticalGradient(
+                    colors = listOf(MarkGoldDeep, PlayEdge),
+                    startY = from,
+                    endY = to
+                )
+            )
+        }
+        drawPath(
+            path = path,
+            brush = Brush.verticalGradient(
+                colors = listOf(MarkGoldTop, MarkGold, MarkGoldDeep),
+                startY = from,
+                endY = to
+            )
+        )
+
+        // A bright bevel just under the top edge, which is what reads as carving.
+        clipPath(path) {
+            drawRect(
+                brush = Brush.verticalGradient(
+                    colors = listOf(Color.White.copy(alpha = 0.55f), Color.White.copy(alpha = 0f)),
+                    startY = center.y - edge * 0.5f,
+                    endY = center.y + edge * 0.1f
+                ),
+                topLeft = Offset(center.x - edge, center.y - edge),
+                size = Size(edge * 2f, edge * 2f)
+            )
+        }
+
+        if (badge == StatBadge.CROWN) {
+            val jewels = listOf(
+                -0.45f to -0.12f,
+                0f to -0.31f,
+                0.45f to -0.12f
+            )
+            for ((x, y) in jewels) {
+                drawCircle(
+                    color = Color.White.copy(alpha = 0.95f),
+                    radius = edge * 0.062f,
+                    center = center + Offset(x * edge, y * edge)
+                )
+            }
+        } else {
+            drawPath(
+                path = path,
+                color = Color.White.copy(alpha = 0.40f),
+                style = Stroke(width = edge * 0.05f, join = StrokeJoin.Round)
+            )
+        }
+    }
+}
+
+/**
+ * The menu's corner control: a glossy blue disc with a white rim and its own
+ * glow, so the one small target on the screen still looks moulded like the rest.
+ */
+@Composable
+fun GlossyIconButton(
     icon: ImageVector,
     contentDescription: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    tint: Color = TealInk,
-    size: Int = 48
+    size: Int = 54
 ) {
-    val shape = RoundedCornerShape(16.dp)
-
-    Surface(
-        shape = shape,
-        color = Color.White,
+    Box(
         modifier = modifier
             .size(size.dp)
-            .shadow(
-                elevation = 8.dp,
-                shape = shape,
-                ambientColor = TealInk.copy(alpha = 0.12f),
-                spotColor = TealInk.copy(alpha = 0.18f)
-            )
-            .border(1.dp, TealInk.copy(alpha = 0.06f), shape)
+            .clickable(onClickLabel = contentDescription, onClick = onClick)
+            .semantics { role = Role.Button },
+        contentAlignment = Alignment.Center
     ) {
-        Box(contentAlignment = Alignment.Center) {
-            IconButton(onClick = onClick, modifier = Modifier.size(size.dp)) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = contentDescription,
-                    tint = tint,
-                    modifier = Modifier.size(22.dp)
-                )
-            }
-            Box(
-                modifier = Modifier
-                    .matchParentSize()
-                    .clip(shape)
-                    .background(
-                        Brush.verticalGradient(
-                            listOf(Color.White.copy(alpha = 0.85f), Color.Transparent)
-                        )
-                    )
+        Canvas(Modifier.matchParentSize()) {
+            val edge = this.size.width
+            val center = Offset(edge / 2f, edge / 2f)
+            val radius = edge * 0.46f
+
+            drawCircle(
+                brush = Brush.radialGradient(
+                    colorStops = arrayOf(
+                        0f to DiscLight.copy(alpha = 0.50f),
+                        0.6f to DiscLight.copy(alpha = 0.18f),
+                        1f to Color.Transparent
+                    ),
+                    center = center,
+                    radius = radius * 1.55f
+                ),
+                radius = radius * 1.55f,
+                center = center
+            )
+
+            drawCircle(color = DiscDeep, radius = radius, center = center.copy(y = center.y + edge * 0.045f))
+            drawCircle(
+                brush = Brush.radialGradient(
+                    colorStops = arrayOf(
+                        0f to DiscLight,
+                        0.62f to DiscFace,
+                        1f to DiscDeep
+                    ),
+                    center = center.copy(y = center.y - edge * 0.10f),
+                    radius = radius * 1.30f
+                ),
+                radius = radius,
+                center = center
+            )
+
+            drawOval(
+                brush = Brush.verticalGradient(
+                    colors = listOf(Color.White.copy(alpha = 0.55f), Color.White.copy(alpha = 0f))
+                ),
+                topLeft = Offset(center.x - radius * 0.72f, center.y - radius * 0.98f),
+                size = Size(radius * 1.44f, radius * 0.86f)
+            )
+
+            drawCircle(
+                color = Color.White.copy(alpha = 0.65f),
+                radius = radius,
+                center = center,
+                style = Stroke(width = edge * 0.035f)
             )
         }
+
+        Icon(
+            imageVector = icon,
+            contentDescription = contentDescription,
+            tint = Color.White,
+            modifier = Modifier.size((size * 0.46f).dp)
+        )
     }
 }
 
 /**
- * The menu's primary action: a wide coral pill with a white play glyph, a top
- * sheen and a single soft shadow so it is unmistakably the strongest element.
+ * The menu's primary action: a wide gold pill with a white play glyph, an orange
+ * 3D underside, a wet top sheen and a glow behind it, so it is the loudest thing
+ * on the field by a clear margin.
  */
 @Composable
 fun PlayButton(
@@ -240,56 +490,118 @@ fun PlayButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val shape = RoundedCornerShape(24.dp)
+    val density = LocalDensity.current
+    val face = 70.dp
+    val pill = 7.dp
 
-    Surface(
-        shape = shape,
-        color = Color.Transparent,
+    Box(
         modifier = modifier
             .fillMaxWidth()
-            .height(64.dp)
-            .shadow(
-                elevation = 14.dp,
-                shape = shape,
-                ambientColor = PlayBottom.copy(alpha = 0.26f),
-                spotColor = PlayBottom.copy(alpha = 0.32f)
-            )
+            .height(face + pill)
+            .clickable(onClickLabel = "Play", onClick = onClick)
+            .semantics { role = Role.Button },
+        contentAlignment = Alignment.TopCenter
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .clip(shape)
-                .background(
-                    Brush.horizontalGradient(listOf(PlayTop, PlayMid, PlayBottom))
-                )
-                .clickable(onClick = onClick),
-            contentAlignment = Alignment.Center
-        ) {
-            Box(
-                modifier = Modifier
-                    .matchParentSize()
-                    .background(
-                        Brush.verticalGradient(
-                            listOf(
-                                Color.White.copy(alpha = 0.22f),
-                                Color.Transparent,
-                                Color.Black.copy(alpha = 0.07f)
-                            )
+        Canvas(Modifier.matchParentSize()) {
+            val width = size.width
+            val depth = with(density) { pill.toPx() }
+            val height = with(density) { face.toPx() }
+            val radius = CornerRadius(height / 2f, height / 2f)
+            val center = Offset(width / 2f, height / 2f)
+
+            /*
+             * The bloom. Three rounded plates of falling alpha, each a little
+             * larger than the pill and a little fainter, plus a hot core: that
+             * stacks into light spilling off the button's own edge rather than
+             * the button sitting flat on the field. The canvas is not clipped,
+             * so the spill is free to leave the button's own box.
+             */
+            for (spread in 0 until 3) {
+                val grow = height * (0.10f + 0.15f * spread)
+                val fall = 1f - 0.30f * spread
+                drawRoundRect(
+                    brush = Brush.verticalGradient(
+                        colorStops = arrayOf(
+                            0f to Color.Transparent,
+                            0.40f to MarkGold.copy(alpha = 0.26f * fall),
+                            0.62f to PlayMid.copy(alpha = 0.40f * fall),
+                            1f to Color.Transparent
                         )
-                    )
-            )
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                PlayGlyph(modifier = Modifier.size(20.dp))
-                Spacer(Modifier.width(12.dp))
-                Text(
-                    text = label,
-                    color = Color.White,
-                    fontFamily = UiSans,
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.ExtraBold,
-                    letterSpacing = 3.sp
+                    ),
+                    topLeft = Offset(-grow, depth * 0.4f - grow * 0.55f),
+                    size = Size(width + grow * 2f, height + grow * 1.1f),
+                    cornerRadius = CornerRadius(radius.x + grow, radius.y + grow * 0.8f)
                 )
             }
+            drawCircle(
+                brush = Brush.radialGradient(
+                    colorStops = arrayOf(
+                        0f to MarkGold.copy(alpha = 0.55f),
+                        0.5f to PlayMid.copy(alpha = 0.22f),
+                        1f to Color.Transparent
+                    ),
+                    center = center,
+                    radius = height * 1.15f
+                ),
+                radius = height * 1.15f,
+                center = center
+            )
+
+            // The 3D underside, then the face sitting on top of it.
+            drawRoundRect(
+                color = PlayEdge,
+                topLeft = Offset(0f, depth),
+                size = Size(width, height),
+                cornerRadius = radius
+            )
+            drawRoundRect(
+                brush = Brush.verticalGradient(
+                    0f to PlayTop,
+                    0.50f to PlayMid,
+                    1f to PlayBottom
+                ),
+                topLeft = Offset.Zero,
+                size = Size(width, height),
+                cornerRadius = radius
+            )
+            drawRoundRect(
+                brush = Brush.verticalGradient(
+                    colors = listOf(Color.White.copy(alpha = 0.60f), Color.White.copy(alpha = 0f))
+                ),
+                topLeft = Offset(0f, depth * 1.4f),
+                size = Size(width, height * 0.52f),
+                cornerRadius = radius
+            )
+            drawRoundRect(
+                color = Color.White.copy(alpha = 0.50f),
+                topLeft = Offset(0f, depth * 1.2f),
+                size = Size(width, height),
+                cornerRadius = radius,
+                style = Stroke(width = depth * 0.40f)
+            )
+        }
+
+        Row(
+            modifier = Modifier.height(face),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            PlayGlyph(modifier = Modifier.size(26.dp))
+            Spacer(Modifier.width(14.dp))
+            Text(
+                text = label,
+                color = Color.White,
+                fontFamily = UiSans,
+                fontSize = 28.sp,
+                fontWeight = FontWeight.ExtraBold,
+                letterSpacing = 3.sp,
+                style = TextStyle(
+                    shadow = Shadow(
+                        color = PlayEdge.copy(alpha = 0.95f),
+                        offset = Offset(0f, with(density) { 2.dp.toPx() }),
+                        blurRadius = 0f
+                    )
+                )
+            )
         }
     }
 }

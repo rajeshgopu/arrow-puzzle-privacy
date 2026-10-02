@@ -9,19 +9,22 @@ minimal, tap-to-clear feel.
 
 | Token | Value (existing `ui/theme/Theme.kt`) | Use |
 | --- | --- | --- |
-| Background | `CanvasWhite` → `Cloud` vertical gradient | Every screen |
-| Card / surface | `#FFFFFF` + soft shadow, 16–26dp radius | Panels, overlays, tiles |
-| Primary action | `Coral` (+`CoralDark` pressed) | Play, Next, retry |
-| Accent tiles | `Coral`, `TileBlue`, `Gold`, `Mint` | Arrow tile faces |
-| Text | `Ink` primary, `InkSoft` secondary | All copy |
-| Disabled / locked | `Locked` | Locked level tiles |
+| Home background | `MenuSkyTop` → `MenuSkyDeep` vertical gradient | Home, splash field |
+| Home text | `MenuText`, `MenuTextDim` on the dark field | Home copy |
+| Card / surface | `GlassTop`/`GlassMid`/`GlassDeep` + `GlassRim` border | Home stat plates |
+| Primary action | `PlayTop` → `PlayBottom` pill, `PlayEdge` underside | Play, Next, retry |
+| Accent tiles | `TileCyan`, `TileGreen`, `TileRed`, `TileYellow`, `TileAzure` | Home arrow cubes |
+| Mark | `MarkGold*` / `MarkIce*` over `MarkOutline` + `MarkExtrude` | Wordmark |
+| Light screens | `Ink` primary, `InkSoft` secondary, `#FFFFFF` surface | Level select, settings |
 
 Rules:
 - Portrait only, generous whitespace, no timer anywhere.
 - Arrow glyph is a solid white shape (already drawn in `MainActivity.kt:665`) so
   direction is readable without relying on tile color.
 - Everything interactive is ≥ 48dp; all cards use `RoundedCornerShape`.
-- Corners/typography already fit; no redesign needed, only consolidation.
+- The Home screen and splash are light-on-dark; level select, settings and
+  gameplay keep their own light/neon fields. `Ink`/`CardSurface` are therefore
+  reserved for the light screens.
 
 ## 2. Navigation Map
 
@@ -41,26 +44,32 @@ Privacy Options. Add a real `AppScreen` nav host when Pause/Settings land.
 ## 3. Screens
 
 ### 3.1 Home
-Already implemented (`MainActivity.kt:176`).
+Implemented (`ui/HomeScreen.kt`, art in `ui/components/HomeArt.kt`).
 
 ```text
 ┌──────────────────────────────┐
-│           ARROW              │  large wordmark
-│           PUZZLE             │  Coral second line
-│        ┌──────────┐          │  hero arrow card (196dp)
-│        │    ->    │          │
-│        └──────────┘          │
-│   [ LEVEL 7 ]  [ STARS 14 ★ ]│  StatChip row
-│                              │
-│      (           )           │  reserved banner slot
-│      (           )           │  (68dp, hidden pre-ad)
-│  ██████  P L A Y  ████████   │  Coral primary button
-│           [⚙] [🔊]           │  Settings + sound quick toggles
+│                  ╭──────╮    │  sky field: gradient + bokeh + distant
+│           ▲      │ ⚙    │    │  cubes + glints, planting along the
+│     ▛▀▀▀▀▀▀▀▀▀▀▀▀▀▜            │  bottom edge
+│     ▌  ARROW   ▐            │  chunky logotype: 8-pass cocoa outline,
+│   ▙  ▌ PUZZLE  ▟            │  3-pass extrusion, gold over ice
+│         ▛▀▀▜      ▼          │  three floating arrow cubes orbit it
+│   ░░░▒▒▓▓██▓▒░░░░░░░        │
+│  ░░▒▒  ↑   →→→→  ↓  ▒▒░░    │  4x4 floor of glossy cubes in perspective,
+│  ░▒▒  ←           ▒▒▒░      │  light firing out of the blue arrow
+│  ╭───────────╮ ╭───────────╮ │
+│  │ ♛ LEVEL 17│ │★ STARS 40 │ │  frosted glass plates
+│  ╰───────────╯ ╰───────────╯ │
+│      ╭─────────────╮         │  gold PLAY pill + banner slot
+│      │  ▶  PLAY    │         │
+│      ╰─────────────╯         │
 └──────────────────────────────┘
 ```
-Additions: Settings gear, sound/haptic quick toggle, adaptive-banner slot
-(`ads/` package) pinned above the safe area. Continue-vs-Play label switches to
-`CONTINUE` when `highestUnlocked > 1`.
+Reading order: wordmark and its orbiting cubes, the board they are a sample of,
+the two numbers, then the action, with settings last in the corner. Everything is
+vector art drawn light-on-dark, block sizes follow the content width and the
+flexible parts are weighted, so the composition holds from 4:5 to 21:9 with the
+action button always inside the safe area.
 
 ### 3.2 Level Select
 Exists as a 3-column grid (`ui/LevelSelectScreen.kt`). Reference game uses a

@@ -1,7 +1,5 @@
 package com.gopu.arrow.puzzle.game.ui
 
-import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -12,56 +10,67 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.drawscope.DrawScope
-import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.gopu.arrow.puzzle.game.Direction
 import com.gopu.arrow.puzzle.game.ads.AdHost
 import com.gopu.arrow.puzzle.game.ads.BannerAdSlot
 import com.gopu.arrow.puzzle.game.data.ProgressRepository
-import com.gopu.arrow.puzzle.game.ui.components.GlassIconButton
-import com.gopu.arrow.puzzle.game.ui.components.HeroArrow
+import com.gopu.arrow.puzzle.game.ui.components.ArrowBoardScene
+import com.gopu.arrow.puzzle.game.ui.components.FloatingArrowTile
+import com.gopu.arrow.puzzle.game.ui.components.GlassStatCard
+import com.gopu.arrow.puzzle.game.ui.components.GlossyIconButton
+import com.gopu.arrow.puzzle.game.ui.components.HomeBackdrop
+import com.gopu.arrow.puzzle.game.ui.components.MarkGlow
 import com.gopu.arrow.puzzle.game.ui.components.PlayButton
-import com.gopu.arrow.puzzle.game.ui.components.ProgressCard
+import com.gopu.arrow.puzzle.game.ui.components.SkinCyan
+import com.gopu.arrow.puzzle.game.ui.components.SkinGreen
+import com.gopu.arrow.puzzle.game.ui.components.SkinRed
+import com.gopu.arrow.puzzle.game.ui.components.StatBadge
 import com.gopu.arrow.puzzle.game.ui.components.Wordmark
 import com.gopu.arrow.puzzle.game.ui.theme.ArrowPuzzleTheme
-import com.gopu.arrow.puzzle.game.ui.theme.Ivory
-import com.gopu.arrow.puzzle.game.ui.theme.IvoryBottom
-import com.gopu.arrow.puzzle.game.ui.theme.IvoryTop
-import com.gopu.arrow.puzzle.game.ui.theme.TealInk
-import com.gopu.arrow.puzzle.game.ui.theme.UiSans
-import kotlin.math.min
 import kotlin.math.roundToInt
+
+/**
+ * The proportions of the brand block, all as fractions so the composition is the
+ * same on every screen it is laid out on.
+ *
+ * [MarkHeightEm] is how tall the two-line wordmark is in em, which is what the
+ * block is measured against; the rest are shares of the block's own width. The
+ * title above the mark is the one thing that has to stay clear of it, so its
+ * clearance is a share of the mark rather than a fixed gap.
+ */
+private const val MarkHeightEm = 1.70f
+private const val TopTileShare = 0.22f
+private const val SideTileShare = 0.20f
+private const val TileClearance = 0.05f
 
 /**
  * Main menu.
  *
- * Reading order is deliberate: wordmark, hero arrow, primary action, then
- * progress, with settings last. The column is laid out with weighted gaps so
- * the composition stays balanced from a short 4:5 phone to a tall 21:9 one, and
- * the action button always sits inside the safe area above the gesture bar.
+ * Reading order is deliberate: the wordmark and the three arrow cubes that orbit
+ * it, the board they are a sample of, the two numbers, and then the action, with
+ * settings last in the corner. The block sizes come off the content width and
+ * everything flexible is weighted, so the composition holds from a short 4:5
+ * phone to a tall 21:9 one and the action button always sits inside the safe
+ * area above the gesture bar.
  */
 @Composable
 fun HomeScreen(
@@ -79,149 +88,151 @@ fun HomeScreen(
             .fillMaxSize()
             .windowInsetsPadding(WindowInsets.safeDrawing)
     ) {
-        val gutter = 28.dp
+        val gutter = 20.dp
         val content = maxWidth - gutter * 2
 
         /*
-         * PUZZLE is the widest line of the wordmark and runs at roughly five
-         * em, so the display size follows the available width instead of
-         * wrapping or clipping on a narrow phone.
+         * PUZZLE is the widest line of the wordmark and runs at roughly four and
+         * a half em, so the display size follows the available width: the mark
+         * comes out about 0.6 of the content width, which is what leaves room
+         * for the two cubes either side of it without either one touching a
+         * letter.
          */
-        val titleSize = minOf(54, (content / 5.4f).value.roundToInt()).coerceAtLeast(34)
-        val heroSize = minOf(212.dp, content * 0.70f)
+        val titleSize = minOf(56, (content / 7.4f).value.roundToInt()).coerceAtLeast(28)
 
-        MenuBackdrop()
+        HomeBackdrop(Modifier.fillMaxSize())
 
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = gutter, vertical = 20.dp),
+                .padding(horizontal = gutter, vertical = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(Modifier.height(20.dp))
-            Spacer(Modifier.weight(0.75f))
+            Spacer(Modifier.height(12.dp))
+            Spacer(Modifier.weight(0.30f))
 
-            Wordmark(fontSize = titleSize)
+            WordmarkBlock(fontSize = titleSize)
 
-            Spacer(Modifier.height(30.dp))
+            Spacer(Modifier.weight(0.30f))
 
-            Box(
-                modifier = Modifier
-                    .size(heroSize)
-                    .semantics { contentDescription = "Play. Launch the next arrow." }
-                    .clickable(onClickLabel = "Play", onClick = onPlay),
-                contentAlignment = Alignment.Center
-            ) {
-                HeroArrow(modifier = Modifier.fillMaxSize())
-            }
+            ArrowBoardScene(modifier = Modifier.fillMaxWidth().weight(1.15f))
 
             Spacer(Modifier.height(18.dp))
-
-            Text(
-                text = "TAP TO PLAY",
-                color = TealInk,
-                fontFamily = UiSans,
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 12.sp,
-                letterSpacing = 3.4.sp
-            )
-
-            Spacer(Modifier.weight(1f))
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(14.dp)
             ) {
-                ProgressCard(
+                GlassStatCard(
                     label = "LEVEL",
                     value = highestUnlocked.toString(),
+                    badge = StatBadge.CROWN,
                     modifier = Modifier.weight(1f)
                 )
-                ProgressCard(
+                GlassStatCard(
                     label = "STARS",
                     value = totalStars.toString(),
-                    modifier = Modifier.weight(1f),
-                    showStar = true
+                    badge = StatBadge.STAR,
+                    modifier = Modifier.weight(1f)
                 )
             }
 
-            Spacer(Modifier.height(20.dp))
+            Spacer(Modifier.height(18.dp))
 
             BannerAdSlot(adHost = ads)
 
             PlayButton(onClick = onPlay)
 
-            Spacer(Modifier.height(8.dp))
+            Spacer(Modifier.height(10.dp))
         }
 
-        GlassIconButton(
+        GlossyIconButton(
             icon = Icons.Default.Settings,
             contentDescription = "Settings",
             onClick = onSettings,
             modifier = Modifier
                 .align(Alignment.TopEnd)
-                .padding(top = 16.dp, end = 16.dp)
+                .padding(top = 14.dp, end = 14.dp)
         )
     }
 }
 
 /**
- * Warm ivory field with a soft light behind the hero and an almost invisible
- * diamond lattice, so the flat background still has depth without pulling
- * attention from the arrow.
+ * The brand block: the logotype with a halo and planting behind it, and three
+ * arrow cubes floating around it.
+ *
+ * Every position is computed from the mark's own measured height and the block's
+ * own width rather than from a ratio against a fixed box, which is what keeps
+ * the cube above the title from ever landing on top of the letters. Nothing in
+ * the block is laid out by its own size either, so a cube can never grow the
+ * block and shove the mark off centre.
  */
 @Composable
-private fun MenuBackdrop(modifier: Modifier = Modifier) {
-    Canvas(modifier = modifier.fillMaxSize()) {
-        val width = size.width
-        val height = size.height
+private fun WordmarkBlock(fontSize: Int, modifier: Modifier = Modifier) {
+    BoxWithConstraints(modifier.fillMaxWidth()) {
+        val width = maxWidth
+        val density = LocalDensity.current
 
-        drawRect(
-            brush = Brush.verticalGradient(listOf(IvoryTop, Ivory, IvoryBottom))
-        )
+        // The two lines of the mark, in em, and the em as laid out on this device.
+        val markHeight = with(density) { (fontSize * MarkHeightEm).sp.toDp() }
+        val topTile = width * TopTileShare
+        val sideTile = width * SideTileShare
 
-        drawCircle(
-            brush = Brush.radialGradient(
-                colorStops = arrayOf(
-                    0f to Color.White.copy(alpha = 0.60f),
-                    0.6f to Color.White.copy(alpha = 0.18f),
-                    1f to Color.Transparent
-                ),
-                center = Offset(width * 0.5f, height * 0.44f),
-                radius = width * 0.92f
-            ),
-            radius = width * 0.92f,
-            center = Offset(width * 0.5f, height * 0.44f)
-        )
+        // The cube above the title clears it by a slice of the mark's own height,
+        // so the overlap holds at any font scale.
+        val markTop = topTile + markHeight * TileClearance
+        val markMiddle = markTop + markHeight / 2f
+        val redDrop = width * 0.07f
 
-        val step = 46.dp.toPx()
-        val lattice = TealInk.copy(alpha = 0.028f)
-        val columns = (width / step).toInt() + 2
-        for (index in -1..columns) {
-            val x = index * step
-            drawLine(lattice, Offset(x, 0f), Offset(x + height, height), 1f)
-            drawLine(lattice, Offset(x, 0f), Offset(x - height, height), 1f)
+        // Tall enough to hold the lowest cube as well as the mark, so nothing
+        // in the block can spill out of it.
+        val blockHeight = maxOf(markTop + markHeight, markMiddle + sideTile / 2f + redDrop)
+
+        Box(
+            modifier = Modifier.size(width, blockHeight)
+        ) {
+            MarkGlow(Modifier.matchParentSize())
+
+            Wordmark(
+                fontSize = fontSize,
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .offset(x = (width - width * 0.88f) / 2f, y = markTop)
+                    .rotate(-3f)
+                    .size(width * 0.88f, markHeight)
+            )
+
+            FloatingArrowTile(
+                direction = Direction.UP,
+                skin = SkinCyan,
+                tilt = -7f,
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .offset(x = (width - topTile) / 2f)
+                    .size(topTile)
+            )
+
+            FloatingArrowTile(
+                direction = Direction.RIGHT,
+                skin = SkinGreen,
+                tilt = 10f,
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .offset(x = width * 0.005f, y = markMiddle - sideTile / 2f)
+                    .size(sideTile)
+            )
+
+            FloatingArrowTile(
+                direction = Direction.DOWN,
+                skin = SkinRed,
+                tilt = -13f,
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .offset(x = width - sideTile - width * 0.005f, y = markMiddle + redDrop)
+                    .size(sideTile)
+            )
         }
-
-        val outline = TealInk.copy(alpha = 0.05f)
-        drawDiamond(Offset(width * 0.16f, height * 0.30f), width * 0.30f, outline)
-        drawDiamond(Offset(width * 0.88f, height * 0.74f), width * 0.26f, outline)
     }
-}
-
-private fun DrawScope.drawDiamond(
-    center: Offset,
-    radius: Float,
-    color: Color
-) {
-    val path = Path().apply {
-        moveTo(center.x, center.y - radius)
-        lineTo(center.x + radius * 0.58f, center.y)
-        lineTo(center.x, center.y + radius)
-        lineTo(center.x - radius * 0.58f, center.y)
-        close()
-    }
-    drawPath(path = path, color = color, style = Stroke(width = 1.2.dp.toPx()))
 }
 
 @Preview(showBackground = true, showSystemUi = true)
