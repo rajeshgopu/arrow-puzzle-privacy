@@ -2,6 +2,8 @@ package com.gopu.arrow.puzzle.game.ads
 
 import android.app.Activity
 import android.content.Context
+import android.view.View
+import com.gopu.arrow.puzzle.game.BuildConfig
 import kotlinx.coroutines.flow.StateFlow
 
 /**
@@ -20,6 +22,12 @@ class AdHost(
     val bannerAvailable: StateFlow<Boolean> get() = controller.bannerAvailable
     val rewardedAvailable: StateFlow<Boolean> get() = controller.rewardedAvailable
 
+    /** Whether ads may be requested yet; false until consent is settled. */
+    val canRequestAds: StateFlow<Boolean> get() = controller.canRequestAds
+
+    /** Creates the banner view for a slot, or null when ads are not available. */
+    fun createBannerView(context: Context): View? = controller.createBannerView(context)
+
     /** Called once when a level is completed; shows a paced interstitial. */
     suspend fun onLevelCompleted() {
         completionsSinceInterstitial += 1
@@ -32,11 +40,23 @@ class AdHost(
     suspend fun showRewarded(): Boolean = controller.showRewarded()
 }
 
-/** Google's public sample unit IDs; replace with production IDs before release. */
+/**
+ * Ad unit IDs per build type. Debug builds always use Google's public test
+ * units so no development or manual testing ever serves or clicks a live ad;
+ * release builds use this app's own units.
+ */
 object AdUnitIds {
-    const val REWARDED = "ca-app-pub-3940256099942544/5224354917"
-    const val INTERSTITIAL = "ca-app-pub-3940256099942544/1033173712"
-    const val BANNER = "ca-app-pub-3940256099942544/9214589741"
+    private const val TEST_REWARDED = "ca-app-pub-3940256099942544/5224354917"
+    private const val TEST_INTERSTITIAL = "ca-app-pub-3940256099942544/1033173712"
+    private const val TEST_BANNER = "ca-app-pub-3940256099942544/9214589741"
+
+    private const val LIVE_REWARDED = "ca-app-pub-3319834061576964/1474813821"
+    private const val LIVE_INTERSTITIAL = "ca-app-pub-3319834061576964/2352781229"
+    private const val LIVE_BANNER = "ca-app-pub-3319834061576964/5314734915"
+
+    val REWARDED: String = if (BuildConfig.DEBUG) TEST_REWARDED else LIVE_REWARDED
+    val INTERSTITIAL: String = if (BuildConfig.DEBUG) TEST_INTERSTITIAL else LIVE_INTERSTITIAL
+    val BANNER: String = if (BuildConfig.DEBUG) TEST_BANNER else LIVE_BANNER
 }
 
 /**
@@ -48,6 +68,7 @@ fun defaultAdHost(context: Context): AdHost = AdHost(
         AdMobController(
             context = context.applicationContext,
             activityProvider = { context.findActivity() as? Activity },
+            bannerUnitId = AdUnitIds.BANNER,
             rewardedUnitId = AdUnitIds.REWARDED,
             interstitialUnitId = AdUnitIds.INTERSTITIAL
         )

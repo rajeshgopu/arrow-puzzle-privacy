@@ -197,8 +197,14 @@ Reuse existing `shake` modifier and `Haptics` from `ui/Feedback.kt`.
 
 ## 6. Responsive & Accessibility
 
-- Board sized with `BoxWithConstraints`: `min(maxWidth, maxHeight * 0.62)`, so
-  4×4…7×7 and tablets all keep square cells.
+- Board takes the whole play area the HUD and hint row leave over, and
+  `BoardMetrics` fills that area on both axes instead of letterboxing a square
+  into it. Cells stay square because the shipped levels are portrait boards
+  authored to the same band as the play area; a window whose aspect drifts
+  further than 0.78–1.26 falls back to locking the level's own column:row
+  ratio, and the background dot field covers the margin that leaves.
+- Levels run 3×5 → 7×11 (15 → ~34 arrows) so the grid grows with the space
+  rather than the maze shrinking inside it.
 - Respect `hapticsEnabled` / `soundEnabled`; scale status/spinner text with
   system font scale; all hit targets ≥ 48dp.
 - Direction must be legible from glyph shape alone (color-blind safe).

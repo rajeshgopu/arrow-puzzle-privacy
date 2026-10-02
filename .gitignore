@@ -1,9 +1,11 @@
 .gradle/
+.kotlin/
 build/
 **/build/
 .cxx/
 .idea/
 *.iml
+.kilo/
 local.properties
 signing.properties
 *.jks

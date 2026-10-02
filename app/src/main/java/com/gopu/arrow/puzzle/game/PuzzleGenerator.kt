@@ -1,5 +1,11 @@
 package com.gopu.arrow.puzzle.game
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.runBlocking
+import kotlin.math.min
 import kotlin.random.Random
 
 /** Parameters for [PuzzleGenerator]. */
@@ -12,6 +18,23 @@ data class PuzzleGeneratorConfig(
     val id: String = "generated",
     val pack: Int = 0,
     val order: Int = 0
+)
+
+/**
+ * One level to build: the [config] plus the [seed] its first attempt uses.
+ *
+ * Every request is independent, which is what lets [PuzzleGenerator.generateAll]
+ * run the whole batch across cores at once.
+ */
+data class GenerationRequest(
+    val config: PuzzleGeneratorConfig,
+    val seed: Long,
+    /**
+     * When true, keep advancing the seed until a level carries exactly
+     * `config.arrowCount` arrows, because a plain attempt can place fewer.
+     */
+    val requireExactArrowCount: Boolean = false,
+    val maxAttempts: Int = 300
 )
 
 /**
@@ -28,6 +51,60 @@ data class PuzzleGeneratorConfig(
  * direction of the final body segment into its head.
  */
 object PuzzleGenerator {
+
+    /** Seeds are pure per call, so a batch only needs one worker per core. */
+    private val workers = Runtime.getRuntime().availableProcessors().coerceAtLeast(1)
+
+    /**
+     * Builds every request at once on [Dispatchers.Default] and returns the
+     * levels in request order.
+     *
+     * [generate] keeps all of its state in locals, so requests never share
+     * anything and the batch scales with core count.
+     */
+    suspend fun generateAll(requests: List<GenerationRequest>): List<PuzzleLevel> =
+        coroutineScope {
+            requests.map { request ->
+                async(Dispatchers.Default) { generate(request) }
+            }.awaitAll()
+        }
+
+    /** [generateAll] for callers that are not already in a coroutine. */
+    fun generateAllBlocking(requests: List<GenerationRequest>): List<PuzzleLevel> =
+        runBlocking { generateAll(requests) }
+
+    private suspend fun generate(request: GenerationRequest): PuzzleLevel =
+        if (request.requireExactArrowCount) {
+            generateExact(request)
+        } else {
+            generate(request.config, request.seed)
+        }
+
+    /**
+     * Walks the seed sequence in waves of [workers], keeping the lowest seed in
+     * the first wave that fills the board.
+     *
+     * A wave runs its seeds in parallel but is still resolved in seed order, so
+     * this returns the same level a sequential retry loop would have, while a
+     * batch that needs many retries spends one wave instead of many.
+     */
+    private suspend fun generateExact(request: GenerationRequest): PuzzleLevel {
+        val config = request.config
+        var waveStart = 0
+        while (waveStart < request.maxAttempts) {
+            val waveSize = min(workers, request.maxAttempts - waveStart)
+            val wave = coroutineScope {
+                (0 until waveSize).map { offset ->
+                    async(Dispatchers.Default) {
+                        generate(config, request.seed + waveStart + offset)
+                    }
+                }.awaitAll()
+            }
+            wave.firstOrNull { it.tiles.size == config.arrowCount }?.let { return it }
+            waveStart += waveSize
+        }
+        return generate(config, request.seed)
+    }
 
     fun generate(config: PuzzleGeneratorConfig, seed: Long): PuzzleLevel {
         require(config.width > 0 && config.height > 0) { "Board dimensions must be positive." }
@@ -148,9 +225,6 @@ private fun directionBetween(from: BoardPosition, to: BoardPosition): Direction?
     Direction.entries.firstOrNull {
         from.row + it.rowDelta == to.row && from.column + it.columnDelta == to.column
     }
-
-private fun BoardPosition.step(direction: Direction): BoardPosition =
-    BoardPosition(row + direction.rowDelta, column + direction.columnDelta)
 
 private fun BoardPosition.inBounds(width: Int, height: Int): Boolean =
     row in 0 until height && column in 0 until width

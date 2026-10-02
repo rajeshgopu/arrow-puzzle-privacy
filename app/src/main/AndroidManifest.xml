@@ -6,10 +6,12 @@
         android:allowBackup="true"
         android:label="Arrow Puzzle"
         android:supportsRtl="true"
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher" 
         android:theme="@style/Theme.ArrowPuzzle">
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-3940256099942544~3347511713" />
+            android:value="${admobAppId}" />
         <activity
             android:name="com.gopu.arrow.puzzle.game.MainActivity"
             android:exported="true"

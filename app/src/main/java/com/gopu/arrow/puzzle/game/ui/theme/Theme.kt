@@ -34,8 +34,65 @@ val FlameYellow = Color(0xFFFFC107)
 val BoardDark = Color(0xFF0B222B)
 val BoardCell = Color(0xFF123A46)
 
+/* Premium light menu palette.
+   The menu keeps a warm ivory field with almost no colour in it, so the
+   wordmark gradients, the cyan hero arrow and the coral action button carry
+   every accent on the screen. */
+val Ivory = Color(0xFFF4F5EE)
+val IvoryTop = Color(0xFFFAFBF5)
+val IvoryBottom = Color(0xFFE9ECDF)
+
+/** Wordmark: ARROW runs charcoal into rust, PUZZLE coral into gold. */
+val CharcoalDeep = Color(0xFF23242E)
+val Rust = Color(0xFF8C3A22)
+val Ember = Color(0xFFFF6A3D)
+val AmberGold = Color(0xFFFFA62B)
+
+/** Menu text. Dark blue-teal for headings, a softer tone for supporting copy. */
+val TealInk = Color(0xFF0F3B45)
+val TealMuted = Color(0xFF5F828A)
+
+/** Hero arrow: light facet, body, shaded facet and the 3D edge underneath it. */
+val HeroCyanLight = Color(0xFF6FE6F8)
+val HeroCyan = Color(0xFF23D2EF)
+val HeroCyanDeep = Color(0xFF0B93B4)
+val HeroCyanEdge = Color(0xFF05697F)
+
+/** Primary action gradient, star accent and card surface. */
+val PlayTop = Color(0xFFFF7A45)
+val PlayMid = Color(0xFFFF5A33)
+val PlayBottom = Color(0xFFEE4526)
+val StarGold = Color(0xFFF6B93B)
+val CardSurface = Color(0xFFFCFDF8)
+
 /** Muted dot drawn on cells an arrow has left, so the board grid shows through. */
 val GridDot = Color(0x332C5A66)
+
+/** The seven neon arrow colours the maze cycles through. */
+val NeonGreen = Color(0xFF3DFF9E)
+val NeonOrange = Color(0xFFFF8A1F)
+val NeonBlue = Color(0xFF4D7CFF)
+
+/** Pure white core used for the hot centre of every neon tube. */
+val NeonCore = Color(0xFFFFFFFF)
+
+/** Red reserved for blocked feedback, never used as an arrow colour. */
+val NeonRed = Color(0xFFFF2D55)
+val NeonRedDeep = Color(0xFFC4002B)
+
+/** Dark stage behind the puzzle: page, board plate, and board frame. */
+val StageVoid = Color(0xFF05060F)
+val StageDeep = Color(0xFF0A0A1C)
+val BoardPlate = Color(0xFF101029)
+val BoardPlateEdge = Color(0xFF232352)
+val BoardFrame = Color(0xFF2E2E6B)
+val GridDotDim = Color(0x26FFFFFF)
+
+/** HUD text and surface colours for the neon gameplay screen. */
+val NeonText = Color(0xFFEAF2FF)
+val NeonTextDim = Color(0xFF9AA3D4)
+val NeonPanel = Color(0xFF15152E)
+val NeonPanelSoft = Color(0xFF1E1E3E)
 
 private val ArrowColorScheme = lightColorScheme(
     primary = Coral,
@@ -48,22 +105,22 @@ private val ArrowColorScheme = lightColorScheme(
     onSecondaryContainer = TileBlueDark,
     tertiary = Mint,
     onTertiary = Ink,
-    background = CanvasWhite,
-    onBackground = Ink,
-    surface = Color.White,
-    onSurface = Ink,
-    surfaceVariant = Cloud,
-    onSurfaceVariant = InkSoft,
-    outline = Ink.copy(alpha = 0.25f)
+    background = Ivory,
+    onBackground = TealInk,
+    surface = CardSurface,
+    onSurface = TealInk,
+    surfaceVariant = IvoryBottom,
+    onSurfaceVariant = TealMuted,
+    outline = TealInk.copy(alpha = 0.18f)
 )
 
 private val ArrowTypography = Typography(
-    displaySmall = TextStyle(fontWeight = FontWeight.Black, fontSize = 44.sp, letterSpacing = 2.sp),
-    headlineMedium = TextStyle(fontWeight = FontWeight.Black, fontSize = 26.sp, letterSpacing = 1.sp),
-    titleLarge = TextStyle(fontWeight = FontWeight.Bold, fontSize = 20.sp),
-    titleMedium = TextStyle(fontWeight = FontWeight.Bold, fontSize = 16.sp),
-    labelLarge = TextStyle(fontWeight = FontWeight.Bold, fontSize = 15.sp, letterSpacing = 0.5.sp),
-    bodyMedium = TextStyle(fontWeight = FontWeight.Medium, fontSize = 14.sp)
+    displaySmall = TextStyle(fontFamily = DisplaySerif, fontWeight = FontWeight.Black, fontSize = 44.sp, letterSpacing = 2.sp),
+    headlineMedium = TextStyle(fontFamily = UiSans, fontWeight = FontWeight.ExtraBold, fontSize = 26.sp, letterSpacing = 1.sp),
+    titleLarge = TextStyle(fontFamily = UiSans, fontWeight = FontWeight.Bold, fontSize = 20.sp),
+    titleMedium = TextStyle(fontFamily = UiSans, fontWeight = FontWeight.Bold, fontSize = 16.sp),
+    labelLarge = TextStyle(fontFamily = UiSans, fontWeight = FontWeight.Bold, fontSize = 15.sp, letterSpacing = 0.5.sp),
+    bodyMedium = TextStyle(fontFamily = UiSans, fontWeight = FontWeight.Medium, fontSize = 14.sp)
 )
 
 private val ArrowShapes = Shapes(

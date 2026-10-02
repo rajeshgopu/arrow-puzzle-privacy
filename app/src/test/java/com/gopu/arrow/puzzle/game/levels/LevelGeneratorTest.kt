@@ -1,5 +1,6 @@
 package com.gopu.arrow.puzzle.game.levels
 
+import com.gopu.arrow.puzzle.game.GenerationRequest
 import com.gopu.arrow.puzzle.game.PuzzleGenerator
 import com.gopu.arrow.puzzle.game.PuzzleGeneratorConfig
 import com.gopu.arrow.puzzle.game.PuzzleLevel
@@ -20,12 +21,10 @@ class LevelGeneratorTest {
             add(PuzzleGeneratorConfig(width = 7, height = 7, arrowCount = 24, maxBodyCells = 3, id = "g-7x7"))
         }
 
-        configs.forEach { config ->
-            repeat(25) { seed ->
-                val level = PuzzleGenerator.generate(config, seed = seed.toLong())
-                assertLevelIsSound(level)
-            }
+        val requests = configs.flatMap { config ->
+            (0L until 25L).map { seed -> GenerationRequest(config = config, seed = seed) }
         }
+        PuzzleGenerator.generateAllBlocking(requests).forEach(::assertLevelIsSound)
     }
 
     @Test
@@ -33,12 +32,47 @@ class LevelGeneratorTest {
         val config = PuzzleGeneratorConfig(
             width = 7, height = 7, arrowCount = 24, maxBodyCells = 4, id = "bent"
         )
-        val bentTotal = (0L until 20L).sumOf { seed ->
-            PuzzleGenerator.generate(config, seed)
-                .tiles
-                .count { it.cells.size >= 3 }
-        }
+        val bentTotal = PuzzleGenerator
+            .generateAllBlocking((0L until 20L).map { seed -> GenerationRequest(config = config, seed = seed) })
+            .sumOf { level -> level.tiles.count { it.cells.size >= 3 } }
         assertTrue("Expected generated levels to contain bent arrows", bentTotal > 0)
+    }
+
+    @Test
+    fun parallelBatchMatchesOneSeedAtATime() {
+        val config = configFor(4, 3)
+        val requests = (0L until 12L).map { seed -> GenerationRequest(config = config, seed = seed) }
+
+        val parallel = PuzzleGenerator.generateAllBlocking(requests)
+        val sequential = requests.map { request ->
+            PuzzleGenerator.generate(request.config, request.seed)
+        }
+
+        assertEquals(sequential.size, parallel.size)
+        parallel.forEachIndexed { index, level ->
+            val expected = sequential[index].toLevelJson().toJson()
+            assertEquals("batch order drifted at $index", expected, level.toLevelJson().toJson())
+        }
+    }
+
+    @Test
+    fun parallelExactSearchMatchesTheSequentialSeedWalk() {
+        val config = configFor(5, 4)
+        val request = GenerationRequest(
+            config = config,
+            seed = config.pack * 100_000L + config.order * 1_000L,
+            requireExactArrowCount = true
+        )
+
+        // The sequential rule the parallel wave replaces: lowest seed first.
+        val expected = (0 until 300).asSequence()
+            .map { attempt -> PuzzleGenerator.generate(config, request.seed + attempt) }
+            .firstOrNull { it.tiles.size == config.arrowCount }
+            ?: PuzzleGenerator.generate(config, request.seed)
+
+        val actual = PuzzleGenerator.generateAllBlocking(listOf(request)).single()
+        assertEquals(expected.toLevelJson().toJson(), actual.toLevelJson().toJson())
+        assertEquals(config.arrowCount, actual.tiles.size)
     }
 
     @Test
@@ -46,17 +80,28 @@ class LevelGeneratorTest {
         if (System.getenv("ARROW_PUZZLE_REGENERATE_LEVELS") != "1") return
 
         val directory = levelsDirectory()
-        (2..5).forEach { pack ->
-            var bentInPack = 0
-            (1..LEVELS_PER_PACK).forEach { order ->
+        val requests = (2..5).flatMap { pack ->
+            (1..LEVELS_PER_PACK).map { order ->
                 val config = configFor(pack, order)
-                val level = generateExact(config)
-                assertLevelIsSound(level)
-                bentInPack += level.tiles.count { it.cells.size >= 3 }
-                val file = File(directory, "${level.id}.json")
-                file.writeText(level.toLevelJson().toJson())
+                GenerationRequest(
+                    config = config,
+                    seed = config.pack * 100_000L + config.order * 1_000L,
+                    requireExactArrowCount = true
+                )
             }
-            assertTrue("Pack $pack produced no bent arrows", bentInPack > 0)
+        }
+
+        val levels = PuzzleGenerator.generateAllBlocking(requests)
+
+        val bentByPack = levels
+            .onEach(::assertLevelIsSound)
+            .groupBy({ it.pack }, { it.tiles.count { tile -> tile.cells.size >= 3 } })
+            .mapValues { (_, counts) -> counts.sum() }
+
+        levels.forEach { level -> File(directory, "${level.id}.json").writeText(level.toLevelJson().toJson()) }
+
+        bentByPack.forEach { (pack, bent) ->
+            assertTrue("Pack $pack produced no bent arrows", bent > 0)
         }
     }
 
@@ -101,34 +146,51 @@ class LevelGeneratorTest {
         return true
     }
 
-    private fun generateExact(config: PuzzleGeneratorConfig): PuzzleLevel {
-        val base = config.pack * 100_000L + config.order * 1_000L
-        repeat(300) { attempt ->
-            val level = PuzzleGenerator.generate(config, seed = base + attempt)
-            if (level.tiles.size == config.arrowCount) return level
-        }
-        return PuzzleGenerator.generate(config, seed = base)
-    }
-
+    /**
+     * Board sizes mirror `tools/generate-levels.ps1`: portrait boards in the
+     * same band as the gameplay play area, so the grid fills the plate instead
+     * of letterboxing inside it.
+     */
     private fun configFor(pack: Int, order: Int): PuzzleGeneratorConfig {
         val id = "pack-0$pack-level-${String.format("%02d", order)}"
         // Ramp board size, arrow count and longest body across the packs, and
         // nudge each within a pack, so difficulty climbs level by level.
         return when (pack) {
-            2 -> PuzzleGeneratorConfig(
-                width = 5, height = 5, arrowCount = 9 + order,
-                maxBodyCells = 2 + (order - 1) / 6, id = id, pack = pack, order = order
-            )
-            3 -> PuzzleGeneratorConfig(
-                width = 6, height = 6, arrowCount = 13 + order,
-                maxBodyCells = 2 + (order - 1) / 4, id = id, pack = pack, order = order
-            )
-            4 -> PuzzleGeneratorConfig(
-                width = 7, height = 7, arrowCount = 17 + order,
-                maxBodyCells = 3 + (order - 1) / 6, id = id, pack = pack, order = order
-            )
+            2 -> if (order <= 3) {
+                PuzzleGeneratorConfig(
+                    width = 4, height = 7, arrowCount = 9 + order,
+                    maxBodyCells = 2 + (order - 1) / 6, id = id, pack = pack, order = order
+                )
+            } else {
+                PuzzleGeneratorConfig(
+                    width = 5, height = 8, arrowCount = 13 + order,
+                    maxBodyCells = 2 + (order - 1) / 4, id = id, pack = pack, order = order
+                )
+            }
+            3 -> if (order <= 4) {
+                PuzzleGeneratorConfig(
+                    width = 5, height = 8, arrowCount = 13 + order,
+                    maxBodyCells = 2 + (order - 1) / 4, id = id, pack = pack, order = order
+                )
+            } else {
+                PuzzleGeneratorConfig(
+                    width = 5, height = 9, arrowCount = 15 + order,
+                    maxBodyCells = 3 + (order - 1) / 6, id = id, pack = pack, order = order
+                )
+            }
+            4 -> if (order <= 3) {
+                PuzzleGeneratorConfig(
+                    width = 5, height = 9, arrowCount = 15 + order,
+                    maxBodyCells = 3 + (order - 1) / 6, id = id, pack = pack, order = order
+                )
+            } else {
+                PuzzleGeneratorConfig(
+                    width = 6, height = 10, arrowCount = 17 + order,
+                    maxBodyCells = 3 + (order - 1) / 4, id = id, pack = pack, order = order
+                )
+            }
             else -> PuzzleGeneratorConfig(
-                width = 8, height = 8, arrowCount = 23 + order,
+                width = 7, height = 11, arrowCount = 23 + order,
                 maxBodyCells = 3 + (order - 1) / 4, id = id, pack = pack, order = order
             )
         }

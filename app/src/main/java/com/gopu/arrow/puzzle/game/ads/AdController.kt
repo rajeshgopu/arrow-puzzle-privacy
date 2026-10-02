@@ -1,5 +1,8 @@
 package com.gopu.arrow.puzzle.game.ads
 
+import android.content.Context
+import android.view.View
+import android.widget.TextView
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -11,11 +14,20 @@ import kotlinx.coroutines.flow.asStateFlow
  * SDK directly, and a missing or failed ad never blocks progression.
  */
 interface AdController {
+    /** Whether ads may be requested at all; false until consent is settled. */
+    val canRequestAds: StateFlow<Boolean>
+
     /** Whether a banner slot can currently be filled. */
     val bannerAvailable: StateFlow<Boolean>
 
     /** Whether an opt-in rewarded video is ready to offer. */
     val rewardedAvailable: StateFlow<Boolean>
+
+    /**
+     * Creates the banner view for a slot, already sized and loading. Only call
+     * once [canRequestAds] is true. The caller owns the returned view.
+     */
+    fun createBannerView(context: Context): View?
 
     /** Show a full-screen interstitial. Resolves once the attempt is done. */
     suspend fun showInterstitial()
@@ -26,8 +38,10 @@ interface AdController {
 
 /** Default provider: no ads, nothing blocked. */
 object NoAds : AdController {
+    override val canRequestAds: StateFlow<Boolean> = MutableStateFlow(false).asStateFlow()
     override val bannerAvailable: StateFlow<Boolean> = MutableStateFlow(false).asStateFlow()
     override val rewardedAvailable: StateFlow<Boolean> = MutableStateFlow(false).asStateFlow()
+    override fun createBannerView(context: Context): View? = null
     override suspend fun showInterstitial() = Unit
     override suspend fun showRewarded(): Boolean = false
 }
@@ -37,11 +51,19 @@ object NoAds : AdController {
  * can be exercised without the SDK. Used only when AdMob cannot be initialized.
  */
 class SimulatedAdController : AdController {
+    override val canRequestAds: StateFlow<Boolean> = MutableStateFlow(true).asStateFlow()
     override val bannerAvailable: StateFlow<Boolean> = MutableStateFlow(true).asStateFlow()
     override val rewardedAvailable: StateFlow<Boolean> = MutableStateFlow(true).asStateFlow()
+
+    override fun createBannerView(context: Context): View = TextView(context).apply {
+        text = "AD"
+        gravity = android.view.Gravity.CENTER
+    }
+
     override suspend fun showInterstitial() {
         delay(1_200)
     }
+
     override suspend fun showRewarded(): Boolean {
         delay(1_600)
         return true

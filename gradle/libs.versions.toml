@@ -6,8 +6,8 @@ composeBom = "2024.09.03"
 datastorePreferences = "1.1.1"
 gson = "2.10.1"
 coroutines = "1.7.3"
-playServicesAds = "22.3.0"
-userMessagingPlatform = "2.0.0"
+playServicesAds = "24.0.0"
+userMessagingPlatform = "3.1.0"
 
 [libraries]
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }

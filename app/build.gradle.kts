@@ -13,8 +13,30 @@ val signingProperties = Properties().apply {
     }
 }
 
+val localPropertiesFile = rootProject.file("local.properties")
+val localProperties = Properties().apply {
+    if (localPropertiesFile.isFile) {
+        localPropertiesFile.inputStream().use(::load)
+    }
+}
+
 fun signingValue(key: String): String = signingProperties.getProperty(key)
     ?: error("Missing '$key' in signing.properties")
+
+/** Google's sample app ID. Debug builds always run against test ads. */
+val testAdMobAppId = "ca-app-pub-3940256099942544~3347511713"
+
+/** This app's AdMob App ID, from local.properties (`admob.appId`) or -Padmob.appId. */
+val releaseAdMobAppId: String = (project.findProperty("admob.appId") as String?)
+    ?: localProperties.getProperty("admob.appId")
+    ?: testAdMobAppId
+
+if (releaseAdMobAppId == testAdMobAppId) {
+    logger.warn(
+        "AdMob: no app ID configured. Add 'admob.appId=ca-app-pub-3319834061576964~<digits>' " +
+            "to local.properties; release builds will serve test ads until then."
+    )
+}
 
 kotlin {
     compilerOptions {
@@ -46,8 +68,12 @@ android {
     }
 
     buildTypes {
+        debug {
+            manifestPlaceholders["admobAppId"] = testAdMobAppId
+        }
         release {
             isMinifyEnabled = false
+            manifestPlaceholders["admobAppId"] = releaseAdMobAppId
             if (signingPropertiesFile.isFile) {
                 signingConfig = signingConfigs.getByName("release")
             }

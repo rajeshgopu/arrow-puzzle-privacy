@@ -57,6 +57,7 @@ import androidx.compose.ui.unit.sp
 import com.gopu.arrow.puzzle.game.data.ProgressRepository
 import com.gopu.arrow.puzzle.game.PuzzleLevel
 import com.gopu.arrow.puzzle.game.levels.LEVELS_PER_PACK
+import com.gopu.arrow.puzzle.game.ads.AdHost
 import com.gopu.arrow.puzzle.game.ads.BannerAdSlot
 import com.gopu.arrow.puzzle.game.ui.components.RoundIconButton
 import com.gopu.arrow.puzzle.game.ui.components.StatChip
@@ -83,7 +84,7 @@ fun LevelSelectScreen(
     onLevelClick: (PuzzleLevel) -> Unit,
     onBack: () -> Unit,
     onSettings: () -> Unit = {},
-    showBanner: Boolean = false
+    ads: AdHost? = null
 ) {
     val highestUnlocked by progressRepository.highestUnlockedLevel.collectAsState(initial = 1)
     val bestStars by progressRepository.bestStars.collectAsState(initial = emptyMap())
@@ -145,7 +146,7 @@ fun LevelSelectScreen(
             }
         }
 
-        BannerAdSlot(available = showBanner)
+        BannerAdSlot(adHost = ads)
     }
 }
 

@@ -104,7 +104,15 @@ object PuzzleReducer {
         }
     }
 
-    fun isPathClear(state: PuzzleState, tile: ArrowTile): Boolean {
+    fun isPathClear(state: PuzzleState, tile: ArrowTile): Boolean =
+        blockingCell(state, tile) == null
+
+    /**
+     * The first cell standing between [tile]'s head and the board edge, or
+     * `null` when the arrow can leave. The gameplay screen uses it to place the
+     * red collision glow exactly where a blocked arrow is stopped.
+     */
+    fun blockingCell(state: PuzzleState, tile: ArrowTile): BoardPosition? {
         val index = state.level.tiles.indexOf(tile)
         var position = tile.position.step(tile.direction)
         while (position.isInside(state.level)) {
@@ -112,11 +120,11 @@ object PuzzleReducer {
             // The moving arrow's own body cells leave with it, so they never
             // block its exit; only cells owned by another remaining tile do.
             if (owner != null && owner != index && position in state.remainingTiles) {
-                return false
+                return position
             }
             position = position.step(tile.direction)
         }
-        return true
+        return null
     }
 
     fun firstValidMove(state: PuzzleState): BoardPosition? =
@@ -134,7 +142,7 @@ fun starsForInvalidTaps(invalidTaps: Int): Int = when {
     else -> 1
 }
 
-private fun BoardPosition.step(direction: Direction): BoardPosition = BoardPosition(
+internal fun BoardPosition.step(direction: Direction): BoardPosition = BoardPosition(
     row = row + direction.rowDelta,
     column = column + direction.columnDelta
 )
