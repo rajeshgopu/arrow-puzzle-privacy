@@ -90,14 +90,16 @@ as the defaults:
 
 ```properties
 admob.appId=ca-app-pub-3319834061576964~<digits>
-privacyPolicyUrl=https://<your-public-policy-page>
 ```
 
 Use [local.properties.example](local.properties.example) for the full key list.
-Only `admob.appId` and `privacyPolicyUrl` have no usable default: without the
-app ID a release build keeps Google's test App ID and the SDK serves nothing
-against the real ad units, and without the policy URL the Settings row is
-hidden. The build prints a warning for a missing app ID.
+Only `admob.appId` has no usable default: without it a release build keeps
+Google's test App ID and the SDK serves nothing against the real ad units. The
+build prints a warning for a missing app ID.
+
+The published privacy-policy page is a build default rather than a
+machine-local value, so Settings > Privacy Policy works in every release build
+and points at the same page the Play listing declares.
 
 Ads sit behind a UMP consent gate, so nothing is requested until Google's
 consent state allows it. Settings > Privacy Options reopens the consent form,

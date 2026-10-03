@@ -60,8 +60,16 @@ if (releaseAdMobAppId == testAdMobAppId) {
     )
 }
 
-/** Public privacy-policy URL required by the Play Store listing and Settings. */
-val privacyPolicyUrl = adValue("privacyPolicyUrl", "")
+/**
+ * Public privacy-policy page. The default is the published page the Play
+ * listing and Data safety forms already point at, so a release build carries a
+ * working Settings > Privacy Policy row with nothing machine-local to set;
+ * override it only if the page ever moves.
+ */
+val privacyPolicyUrl = adValue(
+    "privacyPolicyUrl",
+    "https://rajeshgopu.github.io/arrow-puzzle-privacy/privacy-policy.html"
+)
 
 /** BuildConfig string fields need their value quoted and escaped. */
 fun String.asBuildConfigString(): String =

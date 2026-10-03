@@ -16,7 +16,7 @@ admob.rewardedUnitId=ca-app-pub-3319834061576964/1474813821
 admob.interstitialUnitId=ca-app-pub-3319834061576964/2352781229
 
 # --- Play Store listing ------------------------------------------------------
-# Public privacy-policy page. The Play Console requires one on the Data Safety
-# and store listing forms, and Settings hides its Privacy Policy row while this
-# is blank.
-privacyPolicyUrl=
+# Public privacy-policy page. Defaults to the published page the Play Console
+# listing and Data safety forms already point at, and Settings always shows a
+# working Privacy Policy row as a result. Set this key only if the page moves.
+privacyPolicyUrl=https://rajeshgopu.github.io/arrow-puzzle-privacy/privacy-policy.html

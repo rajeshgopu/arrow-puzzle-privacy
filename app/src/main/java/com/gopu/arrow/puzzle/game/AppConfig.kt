@@ -10,9 +10,11 @@ import com.gopu.arrow.puzzle.game.ads.AdConsent
 object AppConfig {
     /**
      * Public privacy-policy URL required by the Play Store and the in-app
-     * Settings entry. Set `privacyPolicyUrl` in local.properties (or pass
-     * -PprivacyPolicyUrl=...); while it is blank the Privacy Policy row is
-     * hidden rather than pointing at a placeholder.
+     * Settings entry. It defaults to the published page the Play listing and
+     * Data safety forms use, and can be moved without editing Kotlin by setting
+     * `privacyPolicyUrl` in local.properties (or passing
+     * -PprivacyPolicyUrl=...); the row is hidden rather than pointing at a
+     * placeholder while it is blank.
      */
     val privacyPolicyUrl: String? =
         BuildConfig.PRIVACY_POLICY_URL.takeIf { it.isNotBlank() }
