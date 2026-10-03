@@ -28,6 +28,14 @@
 - Google Play Games Services (`play-services-games-v2`) for player identity,
   read once at launch and never waited on.
 - Levels are versioned JSON assets.
+- Localization uses Android string resources, with the language chosen in
+  `i18n/AppLanguage.kt` and applied as a composition-local overlay in
+  `i18n/LocalizedApp.kt`. No third-party i18n library, and no
+  `AppCompatDelegate` backport: the app is a plain `ComponentActivity`, and an
+  overlay recomposes strings without recreating the activity, so a language
+  change cannot disturb the board in play. `LocalAppContext` exists because
+  `LocalContext` changes with the language, and anything long-lived (the ad
+  controller, the repositories) must not be rebuilt when it does.
 - Pure game engine separated from Compose UI and ad code.
 
 ## Monetization Decisions
@@ -237,6 +245,29 @@
   since the real provider landed. `local.properties.example` and a README
   section document the keys. Debug build, release APK and unit tests pass; the
   two level-content tests still fail, unchanged.
+- [x] Localized the game into seven languages - English (default and fallback),
+  German, French, Spanish, Brazilian Portuguese, Japanese and Korean - and
+  moved every user-visible string out of the Compose sources into
+  `res/values*/strings.xml`. The status line used to hold its rendered text and
+  clear itself by comparing that text back to an English literal; it now holds
+  the *cause* of the flash (`StatusFlash`) and resolves the string when it draws,
+  which is what makes the clear rule independent of language. `Language` is
+  applied as a composition-local overlay rather than an activity restart, so
+  changing it cannot disturb the board in play, the saved stars, the toggles or
+  the tutorial flag - and `LocalAppContext` keeps the ad controller and the
+  repositories keyed to something that does not change when the language does.
+  Poppins is Latin-only, so `Type.kt` routes Japanese and Korean to the platform
+  CJK family via `AppLanguage.needsSystemFont` instead of shipping a second
+  multi-megabyte font; the wordmark stays on Poppins everywhere. A handful of
+  fixed-height controls were made to wrap or shrink rather than clip - the
+  gameplay status line, the settings title, the home stat plates, the level
+  select title and pack selector, and the result buttons. Three new test classes
+  (`AppLanguageTest`, `L10nStringsTest`, `NoHardCodedUiTextTest`) cover the
+  locale rules, placeholder parity across all seven files, per-label width
+  budgets against the controls they are drawn in, and a source scan that fails
+  the build if user-visible text is hard-coded again. Store copy for all seven
+  languages is in `docs/store/localization.md`; the Japanese and Korean long
+  descriptions there still need a native speaker.
 
 ## Next Actions
 
@@ -244,11 +275,23 @@
    machine-local and cannot be committed. See `local.properties.example`.
 2. Author pack-2 through pack-5 levels (11–50) and keep them passing the
    validator.
+3. Have a native speaker write the Japanese store description and proof-read
+   the Korean one. Both are marked as such in `docs/store/localization.md`. The
+   in-game strings for both languages are finished; only the listing is not.
+4. Before release, screenshot the store art in all seven languages or drop the
+   captions - text burned into a screenshot PNG cannot be localised after
+   upload. See the "In-app text" section of `docs/store/localization.md`.
 
 ## Risks and Guardrails
 
 - Confirm the final game name and branding are available before Play Store
-  submission.
+  submission. The name "Arrow Puzzle" is now load-bearing in a second way: it is
+  deliberately *not* translated, because it is the store listing's search term
+  and the wordmark's lettering. Changing the decision means revisiting the store
+  copy in `docs/store/localization.md`, not just a resource.
+- Keep the language tag in its own DataStore key. It is the one setting that
+  changes what the UI says, so it is also the one that must not be able to touch
+  progress. `L10nStringsTest` enforces the rest of the localization contract.
 - Do not add ads to the gameplay board or trigger them while the player taps.
 - Treat ad load failure as optional: it must never block gameplay.
 - Keep all shipped levels solvable through an automated validator.

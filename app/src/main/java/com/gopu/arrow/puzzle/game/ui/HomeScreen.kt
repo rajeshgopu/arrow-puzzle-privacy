@@ -30,10 +30,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.gopu.arrow.puzzle.game.Direction
+import com.gopu.arrow.puzzle.game.R
 import com.gopu.arrow.puzzle.game.ads.AdHost
 import com.gopu.arrow.puzzle.game.ads.BannerAdSlot
 import com.gopu.arrow.puzzle.game.data.ProgressRepository
@@ -154,14 +156,14 @@ fun HomeScreen(
                  * they were without walking through the level select.
                  */
                 GlassStatCard(
-                    label = "LEVEL",
+                    label = stringResource(R.string.home_level_label),
                     value = highestUnlocked.toString(),
                     badge = StatBadge.CROWN,
                     onClick = { onPlayLevel(highestUnlocked) },
                     modifier = Modifier.weight(1f)
                 )
                 GlassStatCard(
-                    label = "STARS",
+                    label = stringResource(R.string.home_stars_label),
                     value = totalStars.toString(),
                     badge = StatBadge.STAR,
                     modifier = Modifier.weight(1f)
@@ -204,7 +206,7 @@ fun HomeScreen(
 
         GlossyIconButton(
             icon = Icons.Default.Settings,
-            contentDescription = "Settings",
+            contentDescription = stringResource(R.string.a11y_settings),
             onClick = onSettings,
             modifier = Modifier
                 .align(Alignment.TopEnd)

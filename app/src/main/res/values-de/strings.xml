@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    German. English in res/values is the fallback for anything missing here.
+
+    German runs roughly a third longer than English, so the short ALL CAPS
+    labels in this file are deliberately kept short ("WEITER", "TIPP",
+    "LEVELÜBERSICHT" rather than a literal translation of the English). They
+    are sized against fixed-height controls, and a word that fits the button in
+    English can still push a second line out of the card in German.
+-->
+<resources>
+
+    <string name="app_name">Arrow Puzzle</string>
+
+    <!-- Main menu -->
+    <string name="home_level_label">LEVEL</string>
+    <string name="home_stars_label">STERNE</string>
+    <string name="home_player_label">SPIELER</string>
+
+    <!-- Gameplay HUD -->
+    <string name="hud_level">LEVEL %1$d</string>
+    <string name="hud_pack">PACK %1$d</string>
+    <string name="hud_arrows">PFEILE</string>
+    <string name="hud_moves">ZÜGE</string>
+
+    <string name="status_tap_start">ZUM STARTEN TIPPEN</string>
+    <string name="status_tap_clear_route">PFEIL MIT FREIEM WEG TIPPEN</string>
+    <string name="status_tap_glowing_arrow">LEUCHTENDEN PFEIL TIPPEN</string>
+    <string name="status_maze_cleared">LABYRINTH GESCHAFFT</string>
+    <string name="status_out_of_lives">KEINE LEBEN MEHR</string>
+    <string name="status_path_blocked">WEG BLOCKIERT</string>
+    <string name="status_ad_unavailable">WERBUNG NICHT VERFÜGBAR</string>
+
+    <!-- Buttons -->
+    <string name="action_play">SPIELEN</string>
+    <string name="action_start">START</string>
+    <string name="action_resume">WEITER</string>
+    <string name="action_restart">NEUSTART</string>
+    <string name="action_replay">WIEDERHOLEN</string>
+    <string name="action_settings">EINSTELLUNGEN</string>
+    <string name="action_levels">LEVEL</string>
+    <string name="action_hint">TIPP</string>
+    <string name="action_try_again">NOCHMAL</string>
+    <string name="action_got_it">ALLES KLAR</string>
+    <string name="action_next_level">NÄCHSTES LEVEL</string>
+    <string name="action_back_to_levels">LEVELÜBERSICHT</string>
+    <string name="action_continue_ad">+1 ♥ FORTSETZEN (AD)</string>
+
+    <!-- Pause, victory and failure -->
+    <string name="pause_title">PAUSE</string>
+    <string name="victory_level_clear">LEVEL GESCHAFFT</string>
+    <string name="victory_pack_clear">PACK GESCHAFFT</string>
+    <string name="fail_out_of_lives">KEINE LEBEN MEHR</string>
+    <string name="progress_cleared_format">%1$d von %2$d geschafft</string>
+
+    <!-- Clear celebration -->
+    <string name="celebration_perfect">PERFEKT!</string>
+    <string name="celebration_level_clear">LEVEL GESCHAFFT!</string>
+
+    <!-- Level select. The title is two words; LEVEL leads because the accent
+         gradient belongs on the word doing the work. -->
+    <string name="level_select_title_first">LEVEL</string>
+    <string name="level_select_title_second">AUSWÄHLEN</string>
+    <string name="pack_counter">PACK %1$d / %2$d</string>
+    <string name="pack_title">PACK %1$d</string>
+    <string name="pack_percent">%1$d%%</string>
+    <string name="pack_coming_soon_title">PACK %1$d</string>
+    <string name="pack_coming_soon_body">Mehr Rätsel sind unterwegs</string>
+
+    <!-- Settings -->
+    <string name="settings_title">EINSTELLUNGEN</string>
+    <string name="settings_section_gameplay">SPIEL</string>
+    <string name="settings_section_about">ÜBER</string>
+
+    <string name="settings_sound_title">Ton</string>
+    <string name="settings_sound_subtitle">Tipp- und Kachelgeräusche</string>
+    <string name="settings_haptics_title">Haptik</string>
+    <string name="settings_haptics_subtitle">Vibration beim Tippen</string>
+
+    <string name="settings_launch_title">Startanimation</string>
+    <string name="settings_launch_subtitle">Leuchten beim Abflug eines Pfeils</string>
+    <string name="launch_style_off">Aus</string>
+    <string name="launch_style_minimal">Minimal</string>
+    <string name="launch_style_glow_pulse">Glühen</string>
+    <string name="launch_style_glow_energy">Glühen + Energie</string>
+    <string name="launch_style_full">Voll</string>
+
+    <!-- Language selector. Endonyms, as in every locale. -->
+    <string name="settings_language_title">Sprache</string>
+    <string name="settings_language_subtitle">App-Sprache</string>
+    <string name="settings_language_system_default">Systemstandard</string>
+    <string name="language_english">English</string>
+    <string name="language_german">Deutsch</string>
+    <string name="language_japanese">日本語</string>
+    <string name="language_french">Français</string>
+    <string name="language_korean">한국어</string>
+    <string name="language_spanish">Español</string>
+    <string name="language_portuguese_br">Português (Brasil)</string>
+
+    <!-- How to play, about and privacy -->
+    <string name="about_how_to_play">So wird gespielt</string>
+    <string name="about_privacy_options">Datenschutzoptionen</string>
+    <string name="about_privacy_policy">Datenschutzerklärung</string>
+    <string name="consent_saved">Einwilligungswahl gespeichert.</string>
+    <string name="consent_not_required">Hier gibt es nichts auszuwählen: In deiner Region ist keine Einwilligung erforderlich.</string>
+    <string name="about_version">Arrow Puzzle  •  v%1$s</string>
+
+    <string name="how_to_play_title">SO WIRD GESPielt</string>
+    <string name="how_to_rule_1">Ein Pfeil kann das Feld nur verlassen, wenn alle Felder vor ihm bis zum Rand leer sind.</string>
+    <string name="how_to_rule_2">Tippe einen Pfeil mit freiem Weg an, um ihn zu entfernen.</string>
+    <string name="how_to_rule_3">Tippst du einen blockierten Pfeil an, verlierst du eines deiner drei Leben.</string>
+    <string name="how_to_rule_4">Entferne alle Pfeile, um zu gewinnen. Weniger blockierte Tipps bedeuten mehr Sterne.</string>
+
+    <!-- Accessibility labels -->
+    <string name="a11y_back">Zurück</string>
+    <string name="a11y_settings">Einstellungen</string>
+    <string name="a11y_pause">Pause</string>
+    <string name="a11y_restart">Neu starten</string>
+    <string name="a11y_reset_zoom">Zoom zurücksetzen</string>
+    <string name="a11y_previous_pack">Vorheriges Pack</string>
+    <string name="a11y_next_pack">Nächstes Pack</string>
+    <string name="a11y_play">Spielen</string>
+    <string name="a11y_play_level">Level %1$s spielen</string>
+    <string name="a11y_stat_value">%1$s %2$s</string>
+    <string name="a11y_level_stars">Level %1$d, %2$d von 3 Sternen</string>
+    <string name="a11y_level_locked">Level %1$d, gesperrt</string>
+    <string name="a11y_remove_arrow">Pfeil entfernen</string>
+    <string name="a11y_direction_up">nach oben</string>
+    <string name="a11y_direction_down">nach unten</string>
+    <string name="a11y_direction_left">nach links</string>
+    <string name="a11y_direction_right">nach rechts</string>
+    <string name="a11y_arrow">Pfeil %1$d von %2$d, zeigt %3$s, %4$d Felder lang, Zeile %5$d, Spalte %6$d</string>
+
+</resources>

@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Brazilian Portuguese. English in res/values is the fallback for anything
+    missing here.
+
+    The qualifier is values-pt-rBR, which is what matches a pt-BR device while
+    leaving values-pt free for European Portuguese later. Only pt-BR is
+    translated today; a pt-PT player falls back to English rather than reading
+    Brazilian wording, which is the honest outcome until someone writes that
+    file.
+-->
+<resources>
+
+    <string name="app_name">Arrow Puzzle</string>
+
+    <!-- Main menu -->
+    <string name="home_level_label">NÍVEL</string>
+    <string name="home_stars_label">ESTRELAS</string>
+    <string name="home_player_label">JOGADOR</string>
+
+    <!-- Gameplay HUD -->
+    <string name="hud_level">NÍVEL %1$d</string>
+    <string name="hud_pack">PACOTE %1$d</string>
+    <string name="hud_arrows">SETAS</string>
+    <string name="hud_moves">JOGADAS</string>
+
+    <string name="status_tap_start">TOQUE EM COMECAR</string>
+    <string name="status_tap_clear_route">TOQUE EM UMA SETA COM CAMINHO LIVRE</string>
+    <string name="status_tap_glowing_arrow">TOQUE NA SETA BRILHANTE</string>
+    <string name="status_maze_cleared">LABIRINTO CONCLUÍDO</string>
+    <string name="status_out_of_lives">SEM VIDAS</string>
+    <string name="status_path_blocked">CAMINHO BLOQUEADO</string>
+    <string name="status_ad_unavailable">ANÚNCIO INDISPONÍVEL</string>
+
+    <!-- Buttons -->
+    <string name="action_play">JOGAR</string>
+    <string name="action_start">COMECAR</string>
+    <string name="action_resume">CONTINUAR</string>
+    <string name="action_restart">REINICIAR</string>
+    <string name="action_replay">REPETIR</string>
+    <string name="action_settings">AJUSTES</string>
+    <string name="action_levels">NÍVEIS</string>
+    <string name="action_hint">DICA</string>
+    <string name="action_try_again">TENTAR DE NOVO</string>
+    <string name="action_got_it">ENTENDI</string>
+    <string name="action_next_level">PRÓXIMO NÍVEL</string>
+    <string name="action_back_to_levels">LISTA DE NÍVEIS</string>
+    <string name="action_continue_ad">CONTINUAR +1 ♥ (ANÚNCIO)</string>
+
+    <!-- Pause, victory and failure -->
+    <string name="pause_title">PAUSADO</string>
+    <string name="victory_level_clear">NÍVEL CONCLUÍDO</string>
+    <string name="victory_pack_clear">PACOTE CONCLUÍDO</string>
+    <string name="fail_out_of_lives">SEM VIDAS</string>
+    <string name="progress_cleared_format">%1$d de %2$d concluídos</string>
+
+    <!-- Clear celebration -->
+    <string name="celebration_perfect">PERFEITO!</string>
+    <string name="celebration_level_clear">NÍVEL CONCLUÍDO!</string>
+
+    <!-- Level select -->
+    <string name="level_select_title_first">ESCOLHA</string>
+    <string name="level_select_title_second">O NÍVEL</string>
+    <string name="pack_counter">PACOTE %1$d / %2$d</string>
+    <string name="pack_title">PACOTE %1$d</string>
+    <string name="pack_percent">%1$d%%</string>
+    <string name="pack_coming_soon_title">PACOTE %1$d</string>
+    <string name="pack_coming_soon_body">Mais quebra-cabeças a caminho</string>
+
+    <!-- Settings -->
+    <string name="settings_title">AJUSTES</string>
+    <string name="settings_section_gameplay">JOGO</string>
+    <string name="settings_section_about">SOBRE</string>
+
+    <string name="settings_sound_title">Som</string>
+    <string name="settings_sound_subtitle">Sons de toque e de peça</string>
+    <string name="settings_haptics_title">Vibração</string>
+    <string name="settings_haptics_subtitle">Vibração ao tocar</string>
+
+    <string name="settings_launch_title">Animação de saída</string>
+    <string name="settings_launch_subtitle">Brilho quando a seta sai</string>
+    <string name="launch_style_off">Nenhuma</string>
+    <string name="launch_style_minimal">Mínima</string>
+    <string name="launch_style_glow_pulse">Brilho</string>
+    <string name="launch_style_glow_energy">Brilho + energia</string>
+    <string name="launch_style_full">Completa</string>
+
+    <!-- Language selector. Endonyms, as in every locale. -->
+    <string name="settings_language_title">Idioma</string>
+    <string name="settings_language_subtitle">Idioma do aplicativo</string>
+    <string name="settings_language_system_default">Padrão do sistema</string>
+    <string name="language_english">English</string>
+    <string name="language_german">Deutsch</string>
+    <string name="language_japanese">日本語</string>
+    <string name="language_french">Français</string>
+    <string name="language_korean">한국어</string>
+    <string name="language_spanish">Español</string>
+    <string name="language_portuguese_br">Português (Brasil)</string>
+
+    <!-- How to play, about and privacy -->
+    <string name="about_how_to_play">Como jogar</string>
+    <string name="about_privacy_options">Opções de privacidade</string>
+    <string name="about_privacy_policy">Política de privacidade</string>
+    <string name="consent_saved">Suas escolhas de consentimento foram salvas.</string>
+    <string name="consent_not_required">Nada para escolher aqui: o consentimento não é exigido na sua região.</string>
+    <string name="about_version">Arrow Puzzle  •  v%1$s</string>
+
+    <string name="how_to_play_title">COMO JOGAR</string>
+    <string name="how_to_rule_1">Uma seta só sai do tabuleiro quando todas as casas à frente dela, até a borda, estão vazias.</string>
+    <string name="how_to_rule_2">Toque em uma seta com caminho livre para removê-la.</string>
+    <string name="how_to_rule_3">Se você tocar em uma seta bloqueada, perde uma das três vidas.</string>
+    <string name="how_to_rule_4">Remova todas as setas para vencer. Quanto menos toques bloqueados, mais estrelas você ganha.</string>
+
+    <!-- Accessibility labels -->
+    <string name="a11y_back">Voltar</string>
+    <string name="a11y_settings">Ajustes</string>
+    <string name="a11y_pause">Pausar</string>
+    <string name="a11y_restart">Reiniciar</string>
+    <string name="a11y_reset_zoom">Redefinir o zoom</string>
+    <string name="a11y_previous_pack">Pacote anterior</string>
+    <string name="a11y_next_pack">Próximo pacote</string>
+    <string name="a11y_play">Jogar</string>
+    <string name="a11y_play_level">Jogar o nível %1$s</string>
+    <string name="a11y_stat_value">%1$s %2$s</string>
+    <string name="a11y_level_stars">Nível %1$d, %2$d de 3 estrelas</string>
+    <string name="a11y_level_locked">Nível %1$d, bloqueado</string>
+    <string name="a11y_remove_arrow">Remover a seta</string>
+    <string name="a11y_direction_up">para cima</string>
+    <string name="a11y_direction_down">para baixo</string>
+    <string name="a11y_direction_left">para a esquerda</string>
+    <string name="a11y_direction_right">para a direita</string>
+    <string name="a11y_arrow">Seta %1$d de %2$d, apontando %3$s, %4$d casas de comprimento, linha %5$d, coluna %6$d</string>
+
+</resources>

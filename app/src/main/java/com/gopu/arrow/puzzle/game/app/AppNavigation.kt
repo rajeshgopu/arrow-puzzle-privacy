@@ -23,10 +23,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.platform.LocalContext
 import com.gopu.arrow.puzzle.game.ads.AdHost
 import com.gopu.arrow.puzzle.game.ads.defaultAdHost
 import com.gopu.arrow.puzzle.game.data.ProgressRepository
+import com.gopu.arrow.puzzle.game.i18n.LocalAppContext
 import com.gopu.arrow.puzzle.game.ArrowTile
 import com.gopu.arrow.puzzle.game.BoardPosition
 import com.gopu.arrow.puzzle.game.Direction
@@ -245,14 +245,19 @@ private fun Modifier.swallowsTouches(): Modifier = pointerInput(Unit) {
  * would be visible.
  */
 @Composable
-fun ArrowPuzzleApp() {
+fun ArrowPuzzleApp(progressRepository: ProgressRepository) {
     var screen by remember { mutableStateOf(AppScreen.HOME) }
     var settingsReturn by remember { mutableStateOf(AppScreen.HOME) }
     var exiting by remember { mutableStateOf<AppScreen?>(null) }
     var swapId by remember { mutableIntStateOf(0) }
     var destinationReady by remember { mutableStateOf(false) }
-    val context = LocalContext.current
-    val progressRepository = remember(context) { ProgressRepository(context) }
+    /*
+     * The app context, not the localised one. A language change hands the tree a
+     * different Context, and rebuilding the ad host when that happens would tear
+     * down a banner view and a consent gate over a settings change - so the
+     * repository and the ad host are keyed on the activity that will outlive it.
+     */
+    val context = LocalAppContext.current
     val levelRepository = remember(context) { LevelRepository(context) }
     val adHost = remember(context) { defaultAdHost(context) }
     val packs = remember(levelRepository) {

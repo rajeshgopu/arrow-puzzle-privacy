@@ -3,11 +3,15 @@ package com.gopu.arrow.puzzle.game.ui.components
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.annotation.StringRes
+import androidx.compose.ui.res.stringResource
+import com.gopu.arrow.puzzle.game.R
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlin.math.max
@@ -22,23 +26,31 @@ import kotlin.math.max
  * Every style is a [LaunchAnimationProfile] built by [launchProfile], so adding a
  * style is one constant here and one arm of that function — the board, the level
  * and the reducer are untouched.
+ *
+ * [labelRes] is a resource rather than a literal because the settings screen is
+ * translated. What is persisted is [name], which is unchanged, so a style chosen
+ * before this build still reads back correctly.
  */
-enum class LaunchAnimationStyle(val label: String, val implemented: Boolean) {
+enum class LaunchAnimationStyle(@StringRes val labelRes: Int, val implemented: Boolean) {
 
     /** No launch animation at all. */
-    OFF("Off", true),
+    OFF(R.string.launch_style_off, true),
 
     /** A brief, quiet bloom on the arrow and nothing else. */
-    MINIMAL("Minimal", true),
+    MINIMAL(R.string.launch_style_minimal, true),
 
     /** A soft glow pulse on the tapped arrow, then the usual departure. */
-    GLOW_PULSE("Glow Pulse", true),
+    GLOW_PULSE(R.string.launch_style_glow_pulse, true),
 
     /** The glow pulse, plus sparks and a shock ring thrown off the arrow. */
-    GLOW_ENERGY("Glow + Energy", true),
+    GLOW_ENERGY(R.string.launch_style_glow_energy, true),
 
     /** Everything, at its widest and brightest. */
-    FULL("Full", true);
+    FULL(R.string.launch_style_full, true);
+
+    /** The style's name in the player's language. */
+    val label: String
+        @Composable @ReadOnlyComposable get() = stringResource(labelRes)
 
     /** True when a valid tap plays anything at all. */
     val animatesTap: Boolean get() = implemented && this != OFF

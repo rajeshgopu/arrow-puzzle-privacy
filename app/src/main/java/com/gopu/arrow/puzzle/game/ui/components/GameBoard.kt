@@ -37,6 +37,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.onClick
@@ -49,6 +50,8 @@ import com.gopu.arrow.puzzle.game.Direction
 import com.gopu.arrow.puzzle.game.GameStatus
 import com.gopu.arrow.puzzle.game.PuzzleLevel
 import com.gopu.arrow.puzzle.game.PuzzleState
+import com.gopu.arrow.puzzle.game.R
+import com.gopu.arrow.puzzle.game.i18n.spoken
 import com.gopu.arrow.puzzle.game.ui.theme.BoardFrame
 import com.gopu.arrow.puzzle.game.ui.theme.BoardPlate
 import com.gopu.arrow.puzzle.game.ui.theme.BoardPlateEdge
@@ -397,6 +400,12 @@ fun ArrowBoard(
         }
 
         // One TalkBack button per remaining arrow, anchored on its head cell.
+        //
+        // The two labels are resolved up here rather than inside `semantics`,
+        // which is read outside a composable, so each cell's description is
+        // formatted once per composition in the active language instead of
+        // being assembled from English fragments at the moment it is read.
+        val removeArrowLabel = stringResource(R.string.a11y_remove_arrow)
         Column(modifier = Modifier.fillMaxSize()) {
             repeat(level.height) { row ->
                 Row(
@@ -412,6 +421,17 @@ fun ArrowBoard(
                             inputEnabled &&
                             state.status == GameStatus.PLAYING &&
                             canSelect(tileIndex!!)
+                        val description = tile?.let {
+                            stringResource(
+                                R.string.a11y_arrow,
+                                tileIndex!! + 1,
+                                level.tiles.size,
+                                it.direction.spoken(),
+                                it.cells.size,
+                                row + 1,
+                                column + 1
+                            )
+                        }.orEmpty()
                         Box(
                             modifier = Modifier
                                 .weight(1f)
@@ -420,12 +440,8 @@ fun ArrowBoard(
                                     if (selectable) {
                                         Modifier.semantics {
                                             role = Role.Button
-                                            contentDescription =
-                                                "Arrow ${tileIndex + 1} of ${level.tiles.size}, " +
-                                                    "pointing ${tile!!.direction.name.lowercase()}, " +
-                                                    "${tile.cells.size} cells long, row ${row + 1}, " +
-                                                    "column ${column + 1}"
-                                            onClick(label = "Remove arrow") { onArrowTap(tileIndex); true }
+                                            contentDescription = description
+                                            onClick(label = removeArrowLabel) { onArrowTap(tileIndex); true }
                                         }
                                     } else {
                                         Modifier

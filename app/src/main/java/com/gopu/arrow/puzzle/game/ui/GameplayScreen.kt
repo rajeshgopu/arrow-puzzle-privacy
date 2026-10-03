@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
@@ -45,6 +46,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -52,6 +54,7 @@ import androidx.compose.ui.unit.sp
 import com.gopu.arrow.puzzle.game.GameStatus
 import com.gopu.arrow.puzzle.game.PuzzleLevel
 import com.gopu.arrow.puzzle.game.PuzzleReducer
+import com.gopu.arrow.puzzle.game.R
 import com.gopu.arrow.puzzle.game.step
 import com.gopu.arrow.puzzle.game.ads.AdHost
 import com.gopu.arrow.puzzle.game.ads.NoAds
@@ -93,7 +96,22 @@ import kotlinx.coroutines.withTimeoutOrNull
 
 private enum class TutorialStage { PREPARE, FIRST_MOVE, COMPLETE }
 
+/**
+ * The transient messages that can take over the status line.
+ *
+ * This is an enum rather than a [String] on purpose. The line used to hold the
+ * rendered text and clear itself by comparing that text back to the literal it
+ * had just set, which only works in one language - a translated "PATH BLOCKED"
+ * would never match, so the message would never clear. Holding the cause instead
+ * of the wording keeps the clear rule independent of translation, and lets the
+ * status line resolve the string itself at the moment it draws.
+ */
+private enum class StatusFlash { PATH_BLOCKED, AD_UNAVAILABLE }
+
 private const val HINTS_PER_LEVEL = 3
+
+/** How long a flash stays on the status line before it is cleared. */
+private const val FLASH_MILLIS = 900L
 
 /**
  * The game screen: a neon HUD over the glowing maze, with pause, hint, and
@@ -136,7 +154,7 @@ fun GameplayScreen(
     }
     var block by remember(level) { mutableStateOf<ArrowBlock?>(null) }
     var departure by remember(level) { mutableStateOf<ArrowLaunch?>(null) }
-    var statusMessage by remember(level) { mutableStateOf<String?>(null) }
+    var statusFlash by remember(level) { mutableStateOf<StatusFlash?>(null) }
     var paused by remember(level) { mutableStateOf(false) }
     var showSettings by remember(level) { mutableStateOf(false) }
     var hintsRemaining by remember(level) { mutableStateOf(HINTS_PER_LEVEL) }
@@ -168,7 +186,7 @@ fun GameplayScreen(
         tutorialStage = if (showTutorial) TutorialStage.PREPARE else TutorialStage.COMPLETE
         block = null
         departure = null
-        statusMessage = null
+        statusFlash = null
         hintTileIndex = null
         hintsRemaining = HINTS_PER_LEVEL
         rewardedUsed = false
@@ -219,7 +237,7 @@ fun GameplayScreen(
         gameState.status == GameStatus.PLAYING
 
     val statusTone = when {
-        statusMessage != null -> NeonRed
+        statusFlash != null -> NeonRed
         gameState.status == GameStatus.WON -> NeonGreen
         gameState.status == GameStatus.LOST -> NeonRed
         tutorialStage == TutorialStage.PREPARE -> NeonAmber
@@ -245,36 +263,38 @@ fun GameplayScreen(
             ) {
                 NeonIconButton(
                     icon = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Back",
+                    contentDescription = stringResource(R.string.a11y_back),
                     tint = NeonCyan,
                     onClick = onBackToSelect
                 )
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
-                        "LEVEL ${level.order}",
+                        stringResource(R.string.hud_level, level.order),
                         color = NeonText,
                         fontWeight = FontWeight.Black,
                         fontSize = 22.sp,
-                        letterSpacing = 1.sp
+                        letterSpacing = 1.sp,
+                        maxLines = 1
                     )
                     Text(
-                        "PACK ${level.pack}",
+                        stringResource(R.string.hud_pack, level.pack),
                         color = NeonTextDim,
                         fontWeight = FontWeight.Bold,
                         fontSize = 11.sp,
-                        letterSpacing = 3.sp
+                        letterSpacing = 3.sp,
+                        maxLines = 1
                     )
                 }
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     NeonIconButton(
                         icon = Icons.Default.Settings,
-                        contentDescription = "Settings",
+                        contentDescription = stringResource(R.string.a11y_settings),
                         tint = NeonViolet,
                         onClick = { showSettings = true }
                     )
                     NeonIconButton(
                         icon = Icons.Default.Pause,
-                        contentDescription = "Pause",
+                        contentDescription = stringResource(R.string.a11y_pause),
                         tint = NeonMagenta,
                         onClick = { paused = true }
                     )
@@ -293,8 +313,8 @@ fun GameplayScreen(
                     activeColor = NeonRed,
                     emptyColor = NeonPanel
                 )
-                NeonChip(label = "ARROWS", value = "$remainingArrows")
-                NeonChip(label = "MOVES", value = "$cleared", accent = NeonLime)
+                NeonChip(label = stringResource(R.string.hud_arrows), value = "$remainingArrows")
+                NeonChip(label = stringResource(R.string.hud_moves), value = "$cleared", accent = NeonLime)
             }
 
             Spacer(Modifier.height(10.dp))
@@ -303,26 +323,46 @@ fun GameplayScreen(
 
             Spacer(Modifier.height(8.dp))
 
+            /*
+             * The line resolves its own text rather than being handed a rendered
+             * string, because every branch here is a resource and the same
+             * resource has a different value in each language.
+             */
             AnimatedContent(
                 targetState = when {
-                    gameState.status == GameStatus.WON -> "MAZE CLEARED"
-                    gameState.status == GameStatus.LOST -> "OUT OF LIVES"
-                    tutorialStage == TutorialStage.PREPARE -> "TAP START TO BEGIN"
-                    tutorialStage == TutorialStage.FIRST_MOVE -> "TAP THE GLOWING ARROW"
-                    statusMessage != null -> statusMessage!!
-                    else -> "TAP ANY ARROW WITH A CLEAR ROUTE"
+                    gameState.status == GameStatus.WON -> stringResource(R.string.status_maze_cleared)
+                    gameState.status == GameStatus.LOST -> stringResource(R.string.status_out_of_lives)
+                    tutorialStage == TutorialStage.PREPARE -> stringResource(R.string.status_tap_start)
+                    tutorialStage == TutorialStage.FIRST_MOVE ->
+                        stringResource(R.string.status_tap_glowing_arrow)
+                    statusFlash == StatusFlash.PATH_BLOCKED ->
+                        stringResource(R.string.status_path_blocked)
+                    statusFlash == StatusFlash.AD_UNAVAILABLE ->
+                        stringResource(R.string.status_ad_unavailable)
+                    else -> stringResource(R.string.status_tap_clear_route)
                 },
                 transitionSpec = { fadeIn(tween(200)) togetherWith fadeOut(tween(200)) },
                 label = "status"
             ) { message ->
+                /*
+                 * A minimum height rather than a fixed one, and two lines rather
+                 * than one. German "PFEIL MIT FREIEM WEG TIPPEN" and Spanish
+                 * "TOCA UNA FLECHA CON CAMINO LIBRE" are wider than the English
+                 * they replace, and at 3.5x the font scale even English needs
+                 * the second line - a fixed 20dp would cut the text off
+                 * mid-word. The board below is the only thing that gives height
+                 * up, and losing a row of it is far better than losing words.
+                 */
                 Text(
                     text = message,
-                    modifier = Modifier.fillMaxWidth().height(20.dp),
+                    modifier = Modifier.fillMaxWidth().heightIn(min = 20.dp),
                     color = statusTone,
                     textAlign = TextAlign.Center,
                     fontWeight = FontWeight.Black,
                     fontSize = 13.sp,
-                    letterSpacing = 1.sp
+                    letterSpacing = 1.sp,
+                    lineHeight = 16.sp,
+                    maxLines = 2
                 )
             }
 
@@ -376,15 +416,15 @@ fun GameplayScreen(
                                     cell = blocker ?: tile.position.step(tile.direction),
                                     count = (block?.count ?: 0) + 1
                                 )
-                                statusMessage = "PATH BLOCKED"
+                                statusFlash = StatusFlash.PATH_BLOCKED
                                 haptics.reject()
                                 sounds.reject()
                                 scope.launch {
-                                    delay(900)
-                                    if (statusMessage == "PATH BLOCKED") statusMessage = null
+                                    delay(FLASH_MILLIS)
+                                    if (statusFlash == StatusFlash.PATH_BLOCKED) statusFlash = null
                                 }
                             } else {
-                                statusMessage = null
+                                statusFlash = null
                                 hintTileIndex = null
                                 haptics.success()
                                 sounds.rocketLaunch()
@@ -433,7 +473,7 @@ fun GameplayScreen(
             ) {
                 NeonActionButton(
                     icon = Icons.Default.Lightbulb,
-                    label = "HINT",
+                    label = stringResource(R.string.action_hint),
                     accent = Gold,
                     trailing = "$hintsRemaining",
                     enabled = boardEnabled && tutorialStage == TutorialStage.COMPLETE && hintsRemaining > 0,
@@ -450,7 +490,7 @@ fun GameplayScreen(
                 )
                 NeonIconButton(
                     icon = Icons.Default.Refresh,
-                    contentDescription = "Restart",
+                    contentDescription = stringResource(R.string.a11y_restart),
                     tint = NeonCyan,
                     size = 52,
                     onClick = restartGame
@@ -479,20 +519,20 @@ fun GameplayScreen(
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 DimOverlay(modifier = Modifier.fillMaxSize())
                 ResultOverlay(
-                    title = "PAUSED",
+                    title = stringResource(R.string.pause_title),
                     accent = NeonCyan,
                     surfaceColor = NeonPanel,
                     titleColor = NeonText,
                     subtitleColor = NeonTextDim,
                     secondaryContainerColor = NeonPanel,
                     secondaryContentColor = NeonText,
-                    primaryLabel = "RESUME",
+                    primaryLabel = stringResource(R.string.action_resume),
                     onPrimary = { paused = false },
-                    secondaryLabel = "RESTART",
+                    secondaryLabel = stringResource(R.string.action_restart),
                     onSecondary = restartGame,
-                    tertiaryLabel = "SETTINGS",
+                    tertiaryLabel = stringResource(R.string.action_settings),
                     onTertiary = { showSettings = true },
-                    quaternaryLabel = "LEVELS",
+                    quaternaryLabel = stringResource(R.string.action_levels),
                     onQuaternary = onBackToSelect
                 )
             }
@@ -519,7 +559,9 @@ fun GameplayScreen(
             modifier = Modifier.align(Alignment.Center)
         ) {
             ResultOverlay(
-                title = if (hasNextLevel) "LEVEL CLEAR" else "PACK CLEAR",
+                title = stringResource(
+                    if (hasNextLevel) R.string.victory_level_clear else R.string.victory_pack_clear
+                ),
                 stars = earnedStars,
                 accent = NeonGreen,
                 surfaceColor = NeonPanel,
@@ -528,14 +570,16 @@ fun GameplayScreen(
                 secondaryContainerColor = NeonPanel,
                 secondaryContentColor = NeonText,
                 starTint = Gold,
-                primaryLabel = if (hasNextLevel) "NEXT LEVEL" else "BACK TO LEVELS",
+                primaryLabel = stringResource(
+                    if (hasNextLevel) R.string.action_next_level else R.string.action_back_to_levels
+                ),
                 onPrimary = {
                     scope.launch {
                         ads.onLevelCompleted()
                         if (hasNextLevel) onNextLevel() else onBackToSelect()
                     }
                 },
-                secondaryLabel = "REPLAY",
+                secondaryLabel = stringResource(R.string.action_replay),
                 onSecondary = restartGame
             )
         }
@@ -547,37 +591,38 @@ fun GameplayScreen(
             modifier = Modifier.align(Alignment.Center)
         ) {
             val offerContinue = rewardedAvailable && !rewardedUsed
+            val clearedLine = stringResource(R.string.progress_cleared_format, cleared, totalArrows)
             if (offerContinue) {
                 ResultOverlay(
-                    title = "OUT OF LIVES",
-                    subtitle = "$cleared of $totalArrows cleared",
+                    title = stringResource(R.string.fail_out_of_lives),
+                    subtitle = clearedLine,
                     accent = Gold,
                     surfaceColor = NeonPanel,
                     titleColor = NeonText,
                     subtitleColor = NeonTextDim,
                     secondaryContainerColor = NeonPanel,
                     secondaryContentColor = NeonText,
-                    primaryLabel = "CONTINUE  +1 ♥  (AD)",
+                    primaryLabel = stringResource(R.string.action_continue_ad),
                     onPrimary = {
                         scope.launch {
                             if (ads.showRewarded()) {
                                 rewardedUsed = true
                                 gameState = gameState.copy(lives = 1, status = GameStatus.PLAYING)
                             } else {
-                                statusMessage = "AD UNAVAILABLE"
+                                statusFlash = StatusFlash.AD_UNAVAILABLE
                             }
                         }
                     },
-                    secondaryLabel = "TRY AGAIN",
+                    secondaryLabel = stringResource(R.string.action_try_again),
                     onSecondary = restartGame,
-                    tertiaryLabel = "LEVELS",
+                    tertiaryLabel = stringResource(R.string.action_levels),
                     onTertiary = onBackToSelect
                 )
             } else {
                 ResultOverlay(
-                    title = "OUT OF LIVES",
+                    title = stringResource(R.string.fail_out_of_lives),
                     stars = 0,
-                    subtitle = "$cleared of $totalArrows cleared",
+                    subtitle = clearedLine,
                     accent = NeonRed,
                     surfaceColor = NeonPanel,
                     titleColor = NeonText,
@@ -585,9 +630,9 @@ fun GameplayScreen(
                     secondaryContainerColor = NeonPanel,
                     secondaryContentColor = NeonText,
                     starTint = NeonTextDim,
-                    primaryLabel = "TRY AGAIN",
+                    primaryLabel = stringResource(R.string.action_try_again),
                     onPrimary = restartGame,
-                    secondaryLabel = "LEVELS",
+                    secondaryLabel = stringResource(R.string.action_levels),
                     onSecondary = onBackToSelect
                 )
             }
@@ -612,11 +657,12 @@ private fun NeonStartButton(onClick: () -> Unit) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            "START",
+            stringResource(R.string.action_start),
             color = NeonText,
             fontWeight = FontWeight.Black,
             fontSize = 16.sp,
-            letterSpacing = 3.sp
+            letterSpacing = 3.sp,
+            maxLines = 1
         )
     }
 }

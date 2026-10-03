@@ -1,5 +1,6 @@
 package com.gopu.arrow.puzzle.game.ui.components
 
+import com.gopu.arrow.puzzle.game.R
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertNotSame
@@ -382,8 +383,14 @@ class LaunchAnimationProfileTest {
         assertSame(LaunchAnimationStyle.Default, LaunchAnimationStyle.fromName(null))
         assertSame(LaunchAnimationStyle.GLOW_PULSE, LaunchAnimationStyle.Default)
         assertEquals(
-            listOf("Off", "Minimal", "Glow Pulse", "Glow + Energy", "Full"),
-            LaunchAnimationStyle.options.map { it.label }
+            listOf(
+                R.string.launch_style_off,
+                R.string.launch_style_minimal,
+                R.string.launch_style_glow_pulse,
+                R.string.launch_style_glow_energy,
+                R.string.launch_style_full
+            ),
+            LaunchAnimationStyle.options.map { it.labelRes }
         )
     }
 }

@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Spanish. English in res/values is the fallback for anything missing here.
+
+    Spanish is the longest Latin-script locale here ("ESTRELLAS" is nine
+    characters where the English "STARS" is five), so it is the case that sets
+    the ceiling for the home stat plates and the pack selector. Those two
+    controls ellipsize and wrap rather than clip; see GlassStatCard and
+    PackSelector.
+
+    Inverted punctuation (¡ and ¿) is used as it is written, not as in the
+    English file.
+-->
+<resources>
+
+    <string name="app_name">Arrow Puzzle</string>
+
+    <!-- Main menu -->
+    <string name="home_level_label">NIVEL</string>
+    <string name="home_stars_label">ESTRELLAS</string>
+    <string name="home_player_label">JUGADOR</string>
+
+    <!-- Gameplay HUD -->
+    <string name="hud_level">NIVEL %1$d</string>
+    <string name="hud_pack">PAQUETE %1$d</string>
+    <string name="hud_arrows">FLECHAS</string>
+    <string name="hud_moves">MOVIMIENTOS</string>
+
+    <string name="status_tap_start">TOCA EMPEZAR</string>
+    <string name="status_tap_clear_route">TOCA UNA FLECHA CON CAMINO LIBRE</string>
+    <string name="status_tap_glowing_arrow">TOCA LA FLECHA BRILLANTE</string>
+    <string name="status_maze_cleared">LABERINTO COMPLETADO</string>
+    <string name="status_out_of_lives">SIN VIDAS</string>
+    <string name="status_path_blocked">CAMINO BLOQUEADO</string>
+    <string name="status_ad_unavailable">ANUNCIO NO DISPONIBLE</string>
+
+    <!-- Buttons -->
+    <string name="action_play">JUGAR</string>
+    <string name="action_start">EMPEZAR</string>
+    <string name="action_resume">CONTINUAR</string>
+    <string name="action_restart">REINICIAR</string>
+    <string name="action_replay">REPETIR</string>
+    <string name="action_settings">AJUSTES</string>
+    <string name="action_levels">NIVELES</string>
+    <string name="action_hint">PISTA</string>
+    <string name="action_try_again">REINTENTAR</string>
+    <string name="action_got_it">ENTENDIDO</string>
+    <string name="action_next_level">SIGUIENTE NIVEL</string>
+    <string name="action_back_to_levels">LISTA DE NIVELES</string>
+    <string name="action_continue_ad">CONTINUAR +1 ♥ (ANUNCIO)</string>
+
+    <!-- Pause, victory and failure -->
+    <string name="pause_title">PAUSA</string>
+    <string name="victory_level_clear">NIVEL COMPLETADO</string>
+    <string name="victory_pack_clear">PAQUETE COMPLETADO</string>
+    <string name="fail_out_of_lives">SIN VIDAS</string>
+    <string name="progress_cleared_format">%1$d de %2$d completados</string>
+
+    <!-- Clear celebration -->
+    <string name="celebration_perfect">¡PERFECTO!</string>
+    <string name="celebration_level_clear">¡NIVEL COMPLETADO!</string>
+
+    <!-- Level select -->
+    <string name="level_select_title_first">ELIGE</string>
+    <string name="level_select_title_second">NIVEL</string>
+    <string name="pack_counter">PAQUETE %1$d / %2$d</string>
+    <string name="pack_title">PAQUETE %1$d</string>
+    <string name="pack_percent">%1$d%%</string>
+    <string name="pack_coming_soon_title">PAQUETE %1$d</string>
+    <string name="pack_coming_soon_body">Pronto habrá más puzles</string>
+
+    <!-- Settings -->
+    <string name="settings_title">AJUSTES</string>
+    <string name="settings_section_gameplay">JUEGO</string>
+    <string name="settings_section_about">ACERCA DE</string>
+
+    <string name="settings_sound_title">Sonido</string>
+    <string name="settings_sound_subtitle">Sonidos de toque y de ficha</string>
+    <string name="settings_haptics_title">Vibración</string>
+    <string name="settings_haptics_subtitle">Vibración al tocar</string>
+
+    <string name="settings_launch_title">Animación de salida</string>
+    <string name="settings_launch_subtitle">Brillo al salir una flecha</string>
+    <string name="launch_style_off">Ninguna</string>
+    <string name="launch_style_minimal">Mínima</string>
+    <string name="launch_style_glow_pulse">Destello</string>
+    <string name="launch_style_glow_energy">Destello + energía</string>
+    <string name="launch_style_full">Completa</string>
+
+    <!-- Language selector. Endonyms, as in every locale. -->
+    <string name="settings_language_title">Idioma</string>
+    <string name="settings_language_subtitle">Idioma de la aplicación</string>
+    <string name="settings_language_system_default">Predeterminado del sistema</string>
+    <string name="language_english">English</string>
+    <string name="language_german">Deutsch</string>
+    <string name="language_japanese">日本語</string>
+    <string name="language_french">Français</string>
+    <string name="language_korean">한국어</string>
+    <string name="language_spanish">Español</string>
+    <string name="language_portuguese_br">Português (Brasil)</string>
+
+    <!-- How to play, about and privacy -->
+    <string name="about_how_to_play">Cómo jugar</string>
+    <string name="about_privacy_options">Opciones de privacidad</string>
+    <string name="about_privacy_policy">Política de privacidad</string>
+    <string name="consent_saved">Tus opciones de consentimiento se han guardado.</string>
+    <string name="consent_not_required">Aquí no hay nada que elegir: no se requiere consentimiento en tu región.</string>
+    <string name="about_version">Arrow Puzzle  •  v%1$s</string>
+
+    <string name="how_to_play_title">CÓMO JUGAR</string>
+    <string name="how_to_rule_1">Una flecha solo puede salir del tablero cuando todas las casillas que tiene delante, hasta el borde, están vacías.</string>
+    <string name="how_to_rule_2">Toca una flecha con el camino despejado para quitarla.</string>
+    <string name="how_to_rule_3">Si tocas una flecha bloqueada, pierdes una de tus tres vidas.</string>
+    <string name="how_to_rule_4">Quita todas las flechas para ganar. Cuantos menos toques bloqueados hagas, más estrellas ganarás.</string>
+
+    <!-- Accessibility labels -->
+    <string name="a11y_back">Atrás</string>
+    <string name="a11y_settings">Ajustes</string>
+    <string name="a11y_pause">Pausa</string>
+    <string name="a11y_restart">Reiniciar</string>
+    <string name="a11y_reset_zoom">Restablecer el zoom</string>
+    <string name="a11y_previous_pack">Paquete anterior</string>
+    <string name="a11y_next_pack">Paquete siguiente</string>
+    <string name="a11y_play">Jugar</string>
+    <string name="a11y_play_level">Jugar al nivel %1$s</string>
+    <string name="a11y_stat_value">%1$s %2$s</string>
+    <string name="a11y_level_stars">Nivel %1$d, %2$d de 3 estrellas</string>
+    <string name="a11y_level_locked">Nivel %1$d, bloqueado</string>
+    <string name="a11y_remove_arrow">Quitar la flecha</string>
+    <string name="a11y_direction_up">hacia arriba</string>
+    <string name="a11y_direction_down">hacia abajo</string>
+    <string name="a11y_direction_left">hacia la izquierda</string>
+    <string name="a11y_direction_right">hacia la derecha</string>
+    <string name="a11y_arrow">Flecha %1$d de %2$d, apunta %3$s, %4$d casillas de largo, fila %5$d, columna %6$d</string>
+
+</resources>

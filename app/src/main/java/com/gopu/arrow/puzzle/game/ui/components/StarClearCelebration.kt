@@ -34,10 +34,12 @@ import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
+import com.gopu.arrow.puzzle.game.R
 import com.gopu.arrow.puzzle.game.ui.theme.FlameOrange
 import com.gopu.arrow.puzzle.game.ui.theme.Gold
 import com.gopu.arrow.puzzle.game.ui.theme.NeonAmber
@@ -870,7 +872,7 @@ private fun CelebrationBanner(
                     }
             ) {
                 BannerText(
-                    text = "PERFECT!",
+                    text = stringResource(R.string.celebration_perfect),
                     colors = listOf(NeonCyan, NeonCore, NeonViolet),
                     glow = NeonCyan
                 )
@@ -898,7 +900,7 @@ private fun CelebrationBanner(
                 }
         ) {
             BannerText(
-                text = "LEVEL CLEAR!",
+                text = stringResource(R.string.celebration_level_clear),
                 colors = tier.bannerColors,
                 glow = tier.bannerColors.first()
             )
@@ -918,18 +920,28 @@ private class BannerBrush(private val colors: List<Color>) : ShaderBrush() {
 }
 
 @Composable
+/**
+ * The banner line: two toned by its own gradient rather than a flat block of one
+ * colour, and set with a little less tracking than the 7sp it started on.
+ *
+ * The text is translated, and Spanish "¡NIVEL COMPLETADO!" and Portuguese
+ * "NÍVEL CONCLUÍDO!" are roughly twice the width of "LEVEL CLEAR!" at this
+ * size - wide enough that the tracking has to give way and the banner wraps,
+ * which is why it is allowed two lines. Centred text and a centred box mean the
+ * second line lands under the first rather than beside it.
+ */
 private fun BannerText(text: String, colors: List<Color>, glow: Color) {
     val style = remember(colors) {
         TextStyle(
             brush = BannerBrush(colors),
             fontWeight = FontWeight.Black,
             fontSize = 27.sp,
-            letterSpacing = 7.sp,
+            letterSpacing = 5.sp,
             textAlign = TextAlign.Center,
             shadow = Shadow(color = glow, offset = Offset.Zero, blurRadius = 18f)
         )
     }
-    Text(text = text, style = style)
+    Text(text = text, style = style, maxLines = 2)
 }
 
 /**

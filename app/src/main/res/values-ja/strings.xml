@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Japanese. English in res/values is the fallback for anything missing here.
+
+    Japanese is dense rather than long, so these are shorter than the German and
+    French files and the fixed-height controls are comfortable. Two things to
+    watch when editing:
+
+      * No kanji-only shorthand for the player-facing rules. The how-to-play
+        lines are read by a player who has never seen the game, so they are
+        written in plain form rather than telegraphed game shorthand.
+      * Full-width punctuation (、 。！) reads correctly here; do not swap it for
+        the ASCII forms used in the English file.
+
+    Rendering note: Poppins carries no CJK glyphs. See
+    ui/theme/LocalizedType.kt - the bundled family is used when it covers the
+    script and the system CJK family takes over when it does not, so these
+    strings never fall back to tofu boxes.
+-->
+<resources>
+
+    <string name="app_name">Arrow Puzzle</string>
+
+    <!-- Main menu -->
+    <string name="home_level_label">レベル</string>
+    <string name="home_stars_label">スター</string>
+    <string name="home_player_label">プレイヤー</string>
+
+    <!-- Gameplay HUD -->
+    <string name="hud_level">レベル %1$d</string>
+    <string name="hud_pack">パック %1$d</string>
+    <string name="hud_arrows">矢印</string>
+    <string name="hud_moves">手数</string>
+
+    <string name="status_tap_start">スタートを押してください</string>
+    <string name="status_tap_clear_route">進路が空いている矢印を押してください</string>
+    <string name="status_tap_glowing_arrow">光っている矢印を押してください</string>
+    <string name="status_maze_cleared">迷路クリア</string>
+    <string name="status_out_of_lives">ライフ切れ</string>
+    <string name="status_path_blocked">進路が塞がれています</string>
+    <string name="status_ad_unavailable">広告を表示できません</string>
+
+    <!-- Buttons -->
+    <string name="action_play">プレイ</string>
+    <string name="action_start">スタート</string>
+    <string name="action_resume">再開</string>
+    <string name="action_restart">リスタート</string>
+    <string name="action_replay">リプレイ</string>
+    <string name="action_settings">設定</string>
+    <string name="action_levels">レベル</string>
+    <string name="action_hint">ヒント</string>
+    <string name="action_try_again">もう一度</string>
+    <string name="action_got_it">了解</string>
+    <string name="action_next_level">次のレベルへ</string>
+    <string name="action_back_to_levels">レベル一覧へ</string>
+    <!-- The heart and the +1 are the design and stay; only the words change. -->
+    <string name="action_continue_ad">+1 ♥ で続ける（広告）</string>
+
+    <!-- Pause, victory and failure -->
+    <string name="pause_title">一時停止</string>
+    <string name="victory_level_clear">レベルクリア</string>
+    <string name="victory_pack_clear">パッククリア</string>
+    <string name="fail_out_of_lives">ライフ切れ</string>
+    <!-- Explicit counts, so this needs no plural form. -->
+    <string name="progress_cleared_format">%2$d 個中 %1$d 個 クリア</string>
+
+    <!-- Clear celebration -->
+    <string name="celebration_perfect">パーフェクト！</string>
+    <string name="celebration_level_clear">レベルクリア！</string>
+
+    <!-- Level select. Japanese reads left to right like English, so the
+         particle attaches to the second word: レベル選択. -->
+    <string name="level_select_title_first">レベル</string>
+    <string name="level_select_title_second">選択</string>
+    <string name="pack_counter">パック %1$d / %2$d</string>
+    <string name="pack_title">パック %1$d</string>
+    <string name="pack_percent">%1$d%%</string>
+    <string name="pack_coming_soon_title">パック %1$d</string>
+    <string name="pack_coming_soon_body">新しいパズルはまもなく追加されます</string>
+
+    <!-- Settings -->
+    <string name="settings_title">設定</string>
+    <string name="settings_section_gameplay">ゲーム</string>
+    <string name="settings_section_about">情報</string>
+
+    <string name="settings_sound_title">サウンド</string>
+    <string name="settings_sound_subtitle">タップ音とタイル音</string>
+    <string name="settings_haptics_title">バイブレーション</string>
+    <string name="settings_haptics_subtitle">タップ時の振動</string>
+
+    <string name="settings_launch_title">発射アニメーション</string>
+    <string name="settings_launch_subtitle">矢印が飛び立つときの光</string>
+    <string name="launch_style_off">なし</string>
+    <string name="launch_style_minimal">最小限</string>
+    <string name="launch_style_glow_pulse">光るパルス</string>
+    <string name="launch_style_glow_energy">光＋エネルギー</string>
+    <string name="launch_style_full">フル</string>
+
+    <!-- Language selector. Endonyms, as in every locale. -->
+    <string name="settings_language_title">言語</string>
+    <string name="settings_language_subtitle">アプリの言語</string>
+    <string name="settings_language_system_default">システムの既定</string>
+    <string name="language_english">English</string>
+    <string name="language_german">Deutsch</string>
+    <string name="language_japanese">日本語</string>
+    <string name="language_french">Français</string>
+    <string name="language_korean">한국어</string>
+    <string name="language_spanish">Español</string>
+    <string name="language_portuguese_br">Português (Brasil)</string>
+
+    <!-- How to play, about and privacy -->
+    <string name="about_how_to_play">遊び方</string>
+    <string name="about_privacy_options">プライバシー設定</string>
+    <string name="about_privacy_policy">プライバシーポリシー</string>
+    <string name="consent_saved">同意の選択を保存しました。</string>
+    <string name="consent_not_required">ここでは選択の必要はありません。お住まいの地域では同意が求められていません。</string>
+    <string name="about_version">Arrow Puzzle  •  v%1$s</string>
+
+    <string name="how_to_play_title">遊び方</string>
+    <string name="how_to_rule_1">矢印は、進む方向のマスが端まですべて空いている場合にだけ盤面から出せます。</string>
+    <string name="how_to_rule_2">進路が空いている矢印をタップすると取り除けます。</string>
+    <string name="how_to_rule_3">塞がっている矢印をタップすると、3つのライフのうち1つを失います。</string>
+    <string name="how_to_rule_4">すべての矢印を取り除けば勝利です。塞がれたタップが少ないほど、星を多くもらえます。</string>
+
+    <!-- Accessibility labels -->
+    <string name="a11y_back">戻る</string>
+    <string name="a11y_settings">設定</string>
+    <string name="a11y_pause">一時停止</string>
+    <string name="a11y_restart">リスタート</string>
+    <string name="a11y_reset_zoom">ズームをリセット</string>
+    <string name="a11y_previous_pack">前のパック</string>
+    <string name="a11y_next_pack">次のパック</string>
+    <string name="a11y_play">プレイ</string>
+    <string name="a11y_play_level">レベル %1$s をプレイ</string>
+    <string name="a11y_stat_value">%1$s %2$s</string>
+    <string name="a11y_level_stars">レベル %1$d、3つ中 %2$d 個の星</string>
+    <string name="a11y_level_locked">レベル %1$d、ロック中</string>
+    <string name="a11y_remove_arrow">矢印を取り除く</string>
+    <string name="a11y_direction_up">上</string>
+    <string name="a11y_direction_down">下</string>
+    <string name="a11y_direction_left">左</string>
+    <string name="a11y_direction_right">右</string>
+    <string name="a11y_arrow">%2$d 本中 %1$d 本目の矢印。向きは%3$s、長さ %4$d マス、%5$d 行 %6$d 列</string>
+
+</resources>

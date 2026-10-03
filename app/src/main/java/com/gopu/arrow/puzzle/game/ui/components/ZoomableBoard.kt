@@ -18,8 +18,10 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import com.gopu.arrow.puzzle.game.R
 
 /**
  * Wraps the board with pinch-to-zoom and drag-to-pan so larger grids stay
@@ -78,7 +80,7 @@ fun ZoomableBoard(
         if (scale > minScale + 0.01f) {
             RoundIconButton(
                 icon = Icons.Default.ZoomOutMap,
-                contentDescription = "Reset zoom",
+                contentDescription = stringResource(R.string.a11y_reset_zoom),
                 onClick = {
                     scale = minScale
                     offset = Offset.Zero

@@ -34,6 +34,44 @@ it is solvable. Double-click `tools\view-levels.cmd`, or from PowerShell:
 In the window, use Prev/Next or the arrow keys, and tick "Show removal order"
 to overlay a valid clearing sequence.
 
+## Languages
+
+The game ships in seven languages: English (the default and the fallback),
+German, French, Spanish, Brazilian Portuguese, Japanese and Korean. It follows
+the device language automatically and falls back to English for anything it is
+not translated into. Settings > Language overrides it per player, and the choice
+is remembered across launches.
+
+All user-visible text lives in `app/src/main/res/values*/strings.xml`. English is
+in plain `values` rather than `values-en`, because that folder is also what a
+device set to an untranslated language resolves to.
+
+Nothing in the game logic holds a translated string. The language is chosen by
+`i18n/AppLanguage.kt`, applied by `i18n/LocalizedApp.kt`, and reached from the UI
+with `stringResource`. Changing it is a composition-local swap, not an activity
+restart, so progress, level, settings, achievements and the board in play are
+untouched.
+
+Adding a language is one entry in `AppLanguage` plus one resource folder. See
+[docs/store/localization.md](docs/store/localization.md) for the store copy and
+the full checklist.
+
+#### Two things that are deliberately not translated
+
+- **The game name.** "Arrow Puzzle" is the store listing's search term and the
+  wordmark's own lettering, so it stays English in every locale. The localised
+  short descriptions carry the local search terms instead.
+- **Technical identifiers.** Arrow directions, level asset filenames, package
+  and class names and resource keys are all stable identifiers, not copy. The
+  `Direction` enum keeps its four names; only the screen announces them in words.
+
+#### CJK rendering
+
+Poppins and Playfair Display are subset to Latin, so Japanese and Korean resolve
+the interface family to the platform's own CJK family rather than shipping a
+second multi-megabyte font. The wordmark stays on Poppins in every language,
+because it is Latin by design.
+
 ## Current Build Setup
 
 - Kotlin and Jetpack Compose

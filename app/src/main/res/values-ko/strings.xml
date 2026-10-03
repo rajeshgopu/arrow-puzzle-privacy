@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Korean. English in res/values is the fallback for anything missing here.
+
+    Korean is short and syllable-blocked, so these sit comfortably inside the
+    fixed-height controls. Where Korean needs a particle it is attached to the
+    word before it with a space, which is why phrases here are built per word
+    rather than assembled from fragments.
+
+    Rendering note: Poppins carries no CJK glyphs. See
+    ui/theme/LocalizedType.kt - the bundled family is used when it covers the
+    script and the system CJK family takes over when it does not, so these
+    strings never fall back to tofu boxes.
+-->
+<resources>
+
+    <string name="app_name">Arrow Puzzle</string>
+
+    <!-- Main menu -->
+    <string name="home_level_label">레벨</string>
+    <string name="home_stars_label">별</string>
+    <string name="home_player_label">플레이어</string>
+
+    <!-- Gameplay HUD -->
+    <string name="hud_level">레벨 %1$d</string>
+    <string name="hud_pack">팩 %1$d</string>
+    <string name="hud_arrows">화살표</string>
+    <string name="hud_moves">이동</string>
+
+    <string name="status_tap_start">시작을 눌러주세요</string>
+    <string name="status_tap_clear_route">길이 뚫린 화살표를 누르세요</string>
+    <string name="status_tap_glowing_arrow">빛나는 화살표를 누르세요</string>
+    <string name="status_maze_cleared">미로 완료</string>
+    <string name="status_out_of_lives">라이프 소진</string>
+    <string name="status_path_blocked">길이 막혀 있습니다</string>
+    <string name="status_ad_unavailable">광고를 불러올 수 없습니다</string>
+
+    <!-- Buttons -->
+    <string name="action_play">플레이</string>
+    <string name="action_start">시작</string>
+    <string name="action_resume">계속</string>
+    <string name="action_restart">다시 시작</string>
+    <string name="action_replay">리플레이</string>
+    <string name="action_settings">설정</string>
+    <string name="action_levels">레벨</string>
+    <string name="action_hint">힌트</string>
+    <string name="action_try_again">다시 시도</string>
+    <string name="action_got_it">알겠음</string>
+    <string name="action_next_level">다음 레벨</string>
+    <string name="action_back_to_levels">레벨 목록</string>
+    <string name="action_continue_ad">+1 ♥ 로 계속 (광고)</string>
+
+    <!-- Pause, victory and failure -->
+    <string name="pause_title">일시정지</string>
+    <string name="victory_level_clear">레벨 완료</string>
+    <string name="victory_pack_clear">팩 완료</string>
+    <string name="fail_out_of_lives">라이프 소진</string>
+    <!-- Explicit counts, so this needs no plural form. -->
+    <string name="progress_cleared_format">%2$d개 중 %1$d개 완료</string>
+
+    <!-- Clear celebration -->
+    <string name="celebration_perfect">퍼펙트!</string>
+    <string name="celebration_level_clear">레벨 완료!</string>
+
+    <!-- Level select -->
+    <string name="level_select_title_first">레벨</string>
+    <string name="level_select_title_second">선택</string>
+    <string name="pack_counter">팩 %1$d / %2$d</string>
+    <string name="pack_title">팩 %1$d</string>
+    <string name="pack_percent">%1$d%%</string>
+    <string name="pack_coming_soon_title">팩 %1$d</string>
+    <string name="pack_coming_soon_body">새로운 퍼즐이 곧 추가됩니다</string>
+
+    <!-- Settings -->
+    <string name="settings_title">설정</string>
+    <string name="settings_section_gameplay">게임</string>
+    <string name="settings_section_about">정보</string>
+
+    <string name="settings_sound_title">사운드</string>
+    <string name="settings_sound_subtitle">탭 및 타일 효과음</string>
+    <string name="settings_haptics_title">진동</string>
+    <string name="settings_haptics_subtitle">탭할 때 진동</string>
+
+    <string name="settings_launch_title">발사 애니메이션</string>
+    <string name="settings_launch_subtitle">화살표가 날아갈 때의 빛</string>
+    <string name="launch_style_off">끄기</string>
+    <string name="launch_style_minimal">최소</string>
+    <string name="launch_style_glow_pulse">빛 맥동</string>
+    <string name="launch_style_glow_energy">빛 + 에너지</string>
+    <string name="launch_style_full">전체</string>
+
+    <!-- Language selector. Endonyms, as in every locale. -->
+    <string name="settings_language_title">언어</string>
+    <string name="settings_language_subtitle">앱 언어</string>
+    <string name="settings_language_system_default">시스템 기본값</string>
+    <string name="language_english">English</string>
+    <string name="language_german">Deutsch</string>
+    <string name="language_japanese">日本語</string>
+    <string name="language_french">Français</string>
+    <string name="language_korean">한국어</string>
+    <string name="language_spanish">Español</string>
+    <string name="language_portuguese_br">Português (Brasil)</string>
+
+    <!-- How to play, about and privacy -->
+    <string name="about_how_to_play">플레이 방법</string>
+    <string name="about_privacy_options">개인정보 설정</string>
+    <string name="about_privacy_policy">개인정보 처리방침</string>
+    <string name="consent_saved">동의 선택이 저장되었습니다.</string>
+    <string name="consent_not_required">여기서는 선택할 항목이 없습니다. 해당 지역에서는 동의가 필요하지 않습니다.</string>
+    <string name="about_version">Arrow Puzzle  •  v%1$s</string>
+
+    <string name="how_to_play_title">플레이 방법</string>
+    <string name="how_to_rule_1">화살표는 진행 방향의 칸이 가장자리까지 모두 비어 있을 때만 보드에서 나갈 수 있습니다.</string>
+    <string name="how_to_rule_2">길이 뚫린 화살표를 누르면 제거됩니다.</string>
+    <string name="how_to_rule_3">막힌 화살표를 누르면 세 개의 라이프 중 하나를 잃습니다.</string>
+    <string name="how_to_rule_4">모든 화살표를 없애면 승리합니다. 막힌 탭이 적을수록 별을 더 많이 받습니다.</string>
+
+    <!-- Accessibility labels -->
+    <string name="a11y_back">뒤로</string>
+    <string name="a11y_settings">설정</string>
+    <string name="a11y_pause">일시정지</string>
+    <string name="a11y_restart">다시 시작</string>
+    <string name="a11y_reset_zoom">확대/축소 초기화</string>
+    <string name="a11y_previous_pack">이전 팩</string>
+    <string name="a11y_next_pack">다음 팩</string>
+    <string name="a11y_play">플레이</string>
+    <string name="a11y_play_level">%1$s 레벨 플레이</string>
+    <string name="a11y_stat_value">%1$s %2$s</string>
+    <string name="a11y_level_stars">레벨 %1$d, 별 %2$d/3개</string>
+    <string name="a11y_level_locked">레벨 %1$d, 잠김</string>
+    <string name="a11y_remove_arrow">화살표 제거</string>
+    <string name="a11y_direction_up">위</string>
+    <string name="a11y_direction_down">아래</string>
+    <string name="a11y_direction_left">왼쪽</string>
+    <string name="a11y_direction_right">오른쪽</string>
+    <string name="a11y_arrow">%2$d개 중 %1$d번째 화살표. 방향은 %3$s, 길이 %4$d칸, %5$d행 %6$d열</string>
+
+</resources>

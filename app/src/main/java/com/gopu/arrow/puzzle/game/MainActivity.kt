@@ -9,6 +9,8 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.gopu.arrow.puzzle.game.app.ArrowPuzzleApp
 import com.gopu.arrow.puzzle.game.ads.AdConsent
+import com.gopu.arrow.puzzle.game.data.ProgressRepository
+import com.gopu.arrow.puzzle.game.i18n.LocalizedApp
 import com.gopu.arrow.puzzle.game.playgames.PlayGamesIdentity
 import com.gopu.arrow.puzzle.game.ui.theme.ArrowPuzzleTheme
 
@@ -24,7 +26,21 @@ class MainActivity : ComponentActivity() {
          * Google answers, and the name turns up on the menu whenever it does.
          */
         PlayGamesIdentity.signInSilently(this)
-        setContent { ArrowPuzzleTheme { ArrowPuzzleApp() } }
+        /*
+         * One repository for the whole process, built here so the language and the
+         * app shell read the same DataStore instance. LocalizedApp is outside the
+         * theme on purpose: the theme resolves the interface font, which depends on
+         * the language, so it has to compose inside the override rather than above
+         * it.
+         */
+        val progressRepository = ProgressRepository(this)
+        setContent {
+            LocalizedApp(languageTag = progressRepository.languageTag) {
+                ArrowPuzzleTheme {
+                    ArrowPuzzleApp(progressRepository = progressRepository)
+                }
+            }
+        }
     }
 
     /**

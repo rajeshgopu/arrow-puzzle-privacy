@@ -1,5 +1,6 @@
 package com.gopu.arrow.puzzle.game.ui.components
 
+import com.gopu.arrow.puzzle.game.R
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
@@ -232,9 +233,23 @@ class TapGlowPulseTest {
 
     @Test
     fun theFullOptionSetIsOfferedInOrder() {
+        /*
+         * Resource ids rather than the rendered words: the label is a
+         * `@ReadOnlyComposable` getter now, because the settings screen is
+         * translated. What this pins is the set and the order, which is the part
+         * the picker and the persisted style names depend on; that each id
+         * resolves to the expected English wording is
+         * `L10nStringsTest`'s job, since only a real context can do it.
+         */
         assertEquals(
-            listOf("Off", "Minimal", "Glow Pulse", "Glow + Energy", "Full"),
-            LaunchAnimationStyle.options.map { it.label }
+            listOf(
+                R.string.launch_style_off,
+                R.string.launch_style_minimal,
+                R.string.launch_style_glow_pulse,
+                R.string.launch_style_glow_energy,
+                R.string.launch_style_full
+            ),
+            LaunchAnimationStyle.options.map { it.labelRes }
         )
     }
 

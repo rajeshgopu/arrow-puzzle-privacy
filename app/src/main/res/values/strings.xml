@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Every user-visible string in the game. English is the default and the
+    fallback: this file is res/values (not values-en), so it is what a device
+    with any unsupported language resolves to.
+
+    Rules for adding a language:
+      * Copy this file into res/values-<code> (values-pt-rBR for Brazilian
+        Portuguese, values-b+sr+Latn for a script variant).
+      * Translate every key. A missing key silently falls back to English here,
+        which is safe, so an incomplete translation degrades rather than breaks.
+      * Never reword or drop a placeholder. %1$d, %1$s and so on must survive
+        verbatim, in the same argument positions, or the string will throw at
+        format time. `L10nStringsTest` checks every locale for this.
+      * Do not translate the brand. "Arrow Puzzle" and the ARROW PUZZLE
+        wordmark are proper nouns and stay in English in every locale.
+      * Prepositions and the position of a placeholder are yours to move; the
+        placeholder itself is not. "Level %1$d" may become "Niveau %1$d",
+        and the word after the number may change, but %1$d must stay first if
+        the language wants it first.
+-->
+<resources>
+
+    <!--
+        ==================================================================
+        APP IDENTITY
+        ==================================================================
+    -->
+
+    <!--
+        The launcher name. Also the Play Store listing title, so it stays the
+        English brand in every locale - see the store copy in
+        docs/store/localization.md for the localised search terms around it.
+    -->
+    <string name="app_name" translatable="true">Arrow Puzzle</string>
+
+    <!--
+        ==================================================================
+        MAIN MENU
+        ==================================================================
+    -->
+
+    <!-- Small caps caption on the level shortcut plate. -->
+    <string name="home_level_label">LEVEL</string>
+    <!-- Small caps caption on the star tally plate. -->
+    <string name="home_stars_label">STARS</string>
+    <!-- The player's Play Games display name, shown above the play button. -->
+    <string name="home_player_label">PLAYER</string>
+
+    <!-- ==================================================================
+         GAMEPLAY HUD
+         ================================================================== -->
+
+    <string name="hud_level">LEVEL %1$d</string>
+    <string name="hud_pack">PACK %1$d</string>
+    <string name="hud_arrows">ARROWS</string>
+    <string name="hud_moves">MOVES</string>
+
+    <!--
+        The single status line under the progress bar. It is one fixed height
+        and may wrap to two lines, so keep these short: a translation that
+        needs three lines will be clipped.
+    -->
+    <string name="status_tap_start">TAP START TO BEGIN</string>
+    <string name="status_tap_clear_route">TAP ANY ARROW WITH A CLEAR ROUTE</string>
+    <string name="status_tap_glowing_arrow">TAP THE GLOWING ARROW</string>
+    <string name="status_maze_cleared">MAZE CLEARED</string>
+    <string name="status_out_of_lives">OUT OF LIVES</string>
+    <string name="status_path_blocked">PATH BLOCKED</string>
+    <string name="status_ad_unavailable">AD UNAVAILABLE</string>
+
+    <!-- ==================================================================
+         BUTTONS
+         ================================================================== -->
+
+    <string name="action_play">PLAY</string>
+    <string name="action_start">START</string>
+    <string name="action_resume">RESUME</string>
+    <string name="action_restart">RESTART</string>
+    <string name="action_replay">REPLAY</string>
+    <string name="action_settings">SETTINGS</string>
+    <string name="action_levels">LEVELS</string>
+    <string name="action_hint">HINT</string>
+    <string name="action_try_again">TRY AGAIN</string>
+    <string name="action_got_it">GOT IT</string>
+    <string name="action_next_level">NEXT LEVEL</string>
+    <string name="action_back_to_levels">BACK TO LEVELS</string>
+    <!-- The heart glyph is part of the design and is not translated. -->
+    <string name="action_continue_ad">CONTINUE  +1 ♥  (AD)</string>
+
+    <!-- ==================================================================
+         PAUSE, VICTORY AND FAILURE
+         ================================================================== -->
+
+    <string name="pause_title">PAUSED</string>
+    <string name="victory_level_clear">LEVEL CLEAR</string>
+    <string name="victory_pack_clear">PACK CLEAR</string>
+    <string name="fail_out_of_lives">OUT OF LIVES</string>
+    <!-- Shown under the failure title. Explicit counts, so no plural form. -->
+    <string name="progress_cleared_format">%1$d of %2$d cleared</string>
+
+    <!-- ==================================================================
+         CLEAR CELEBRATION
+         ================================================================== -->
+
+    <string name="celebration_perfect">PERFECT!</string>
+    <string name="celebration_level_clear">LEVEL CLEAR!</string>
+
+    <!-- ==================================================================
+         LEVEL SELECT
+         ================================================================== -->
+
+    <!--
+        The two-tone screen title. The first word is ink, the second is the
+        gradient accent, so the split is part of the design rather than a
+        translation choice: put the shorter word second in languages that want
+        that, and no more than two words.
+    -->
+    <string name="level_select_title_first">SELECT</string>
+    <string name="level_select_title_second">LEVEL</string>
+    <string name="pack_counter">PACK %1$d / %2$d</string>
+    <string name="pack_title">PACK %1$d</string>
+    <string name="pack_percent">%1$d%%</string>
+    <string name="pack_coming_soon_title">PACK %1$d</string>
+    <string name="pack_coming_soon_body">More puzzles are on the way</string>
+
+    <!-- ==================================================================
+         SETTINGS
+         ================================================================== -->
+
+    <string name="settings_title">SETTINGS</string>
+    <string name="settings_section_gameplay">GAMEPLAY</string>
+    <string name="settings_section_about">ABOUT</string>
+
+    <string name="settings_sound_title">Sound</string>
+    <string name="settings_sound_subtitle">Tap and tile sounds</string>
+    <string name="settings_haptics_title">Haptics</string>
+    <string name="settings_haptics_subtitle">Vibration on taps</string>
+
+    <string name="settings_launch_title">Launch Animation</string>
+    <string name="settings_launch_subtitle">Glow when an arrow leaves</string>
+    <string name="launch_style_off">Off</string>
+    <string name="launch_style_minimal">Minimal</string>
+    <string name="launch_style_glow_pulse">Glow Pulse</string>
+    <string name="launch_style_glow_energy">Glow + Energy</string>
+    <string name="launch_style_full">Full</string>
+
+    <!-- ==================================================================
+         LANGUAGE SELECTOR
+         ================================================================== -->
+
+    <string name="settings_language_title">Language</string>
+    <string name="settings_language_subtitle">App language</string>
+    <string name="settings_language_system_default">System default</string>
+
+    <!--
+        Each language is written in its own language, which is what a player
+        scanning the list is looking for. Keep the endonym, not an English
+        gloss: a Japanese player looks for 日本語, not "Japanese".
+    -->
+    <string name="language_english">English</string>
+    <string name="language_german">Deutsch</string>
+    <string name="language_japanese">日本語</string>
+    <string name="language_french">Français</string>
+    <string name="language_korean">한국어</string>
+    <string name="language_spanish">Español</string>
+    <string name="language_portuguese_br">Português (Brasil)</string>
+
+    <!-- ==================================================================
+         HOW TO PLAY, ABOUT AND PRIVACY
+         ================================================================== -->
+
+    <string name="about_how_to_play">How to play</string>
+    <string name="about_privacy_options">Privacy Options</string>
+    <string name="about_privacy_policy">Privacy Policy</string>
+    <string name="consent_saved">Consent choices saved.</string>
+    <string name="consent_not_required">No choices to make here: consent is not required in your region.</string>
+    <string name="about_version">Arrow Puzzle  •  v%1$s</string>
+
+    <string name="how_to_play_title">HOW TO PLAY</string>
+    <string name="how_to_rule_1">An arrow can leave the board only when every cell in front of it, up to the edge, is empty.</string>
+    <string name="how_to_rule_2">Tap an arrow with a clear path to remove it.</string>
+    <string name="how_to_rule_3">Tap a blocked arrow and you lose one of your three lives.</string>
+    <string name="how_to_rule_4">Clear every arrow to win. Fewer blocked taps means more stars.</string>
+
+    <!-- ==================================================================
+         ACCESSIBILITY LABELS
+         ================================================================== -->
+
+    <string name="a11y_back">Back</string>
+    <string name="a11y_settings">Settings</string>
+    <string name="a11y_pause">Pause</string>
+    <string name="a11y_restart">Restart</string>
+    <string name="a11y_reset_zoom">Reset zoom</string>
+    <string name="a11y_previous_pack">Previous pack</string>
+    <string name="a11y_next_pack">Next pack</string>
+    <string name="a11y_play">Play</string>
+    <string name="a11y_play_level">Play level %1$s</string>
+    <!-- The stat plate announces its own caption and its value. -->
+    <string name="a11y_stat_value">%1$s %2$s</string>
+    <string name="a11y_level_stars">Level %1$d, %2$d of 3 stars</string>
+    <string name="a11y_level_locked">Level %1$d, locked</string>
+    <string name="a11y_remove_arrow">Remove arrow</string>
+    <string name="a11y_direction_up">up</string>
+    <string name="a11y_direction_down">down</string>
+    <string name="a11y_direction_left">left</string>
+    <string name="a11y_direction_right">right</string>
+    <!--
+        Announced for each arrow on the board. Both the ordinal and the counts
+        are read by a screen reader, so this reads as a sentence.
+    -->
+    <string name="a11y_arrow">Arrow %1$d of %2$d, pointing %3$s, %4$d cells long, row %5$d, column %6$d</string>
+
+</resources>

@@ -20,6 +20,17 @@ class ProgressRepository(private val context: Context) {
     val launchAnimation: Flow<LaunchAnimationStyle> =
         DataStoreHelper.observeLaunchAnimation(context)
 
+    /**
+     * The language the player picked in Settings, as a BCP 47 tag, or null when
+     * they have not picked one and the device locale decides.
+     *
+     * Presentation only, and deliberately a separate key from everything above:
+     * this is the one setting that changes what the UI *says*, so it is also the
+     * one setting that must not be able to touch progress. `setLanguageTag`
+     * writes one key and nothing else.
+     */
+    val languageTag: Flow<String?> = DataStoreHelper.observeLanguageTag(context)
+
     suspend fun unlockLevel(levelId: String, stars: Int, levelOrder: Int) {
         val current = highestUnlockedLevel.first()
         if (levelOrder > current) {
@@ -37,6 +48,9 @@ class ProgressRepository(private val context: Context) {
 
     suspend fun setLaunchAnimation(style: LaunchAnimationStyle) =
         DataStoreHelper.saveLaunchAnimation(context, style)
+
+    /** Pass null to go back to following the device locale. */
+    suspend fun setLanguageTag(tag: String?) = DataStoreHelper.saveLanguageTag(context, tag)
 
     fun isLevelUnlocked(levelOrder: Int): Boolean = runBlocking { highestUnlockedLevel.first() >= levelOrder }
 }

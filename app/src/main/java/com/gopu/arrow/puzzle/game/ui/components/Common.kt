@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -66,9 +67,12 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.gopu.arrow.puzzle.game.R
 import com.gopu.arrow.puzzle.game.ui.theme.Cloud
 import com.gopu.arrow.puzzle.game.ui.theme.Coral
 import com.gopu.arrow.puzzle.game.ui.theme.DiscDeep
@@ -102,6 +106,7 @@ import com.gopu.arrow.puzzle.game.ui.theme.PlayEdge
 import com.gopu.arrow.puzzle.game.ui.theme.PlayMid
 import com.gopu.arrow.puzzle.game.ui.theme.PlayTop
 import com.gopu.arrow.puzzle.game.ui.theme.UiSans
+import com.gopu.arrow.puzzle.game.ui.theme.UiSansLatin
 import kotlinx.coroutines.delay
 import kotlin.math.cos
 import kotlin.math.min
@@ -205,9 +210,16 @@ fun Wordmark(
     }
 }
 
-/** The shared text style behind every line of the wordmark. */
+/**
+ * The shared text style behind every line of the wordmark.
+ *
+ * [UiSansLatin] and not [UiSans]: the wordmark is the Latin brand in every
+ * locale, so it stays on Poppins even where the interface has moved to the
+ * system CJK family, and the mark on a Japanese menu is the same mark as the
+ * one on an English one.
+ */
 private fun MarkStyle(fontSize: Int, tracking: Float): TextStyle = TextStyle(
-    fontFamily = UiSans,
+    fontFamily = UiSansLatin,
     fontWeight = FontWeight.ExtraBold,
     fontSize = fontSize.sp,
     letterSpacing = (fontSize * tracking).sp,
@@ -232,6 +244,15 @@ enum class StatBadge { CROWN, STAR }
  * Given an [onClick] the plate is a button - it takes a press, dims and settles
  * back, and announces itself as one - which is what lets the level plate double
  * as a way straight into the level it is showing.
+ *
+ * The label is laid out against the width the value leaves it rather than
+ * against the plate, on one line with an ellipsis as the last resort, and it is
+ * set at 11sp with 0.5sp of tracking rather than the 12sp and 2.6sp this started
+ * at. On a 360dp phone the plate is 153dp, and after the badge, the gap and the
+ * padding the caption has 75dp to work with - room for nine Latin capitals at
+ * 12sp with wide tracking, and Spanish "ESTRELLAS" is exactly nine. The
+ * ellipsis is there for the case that still does not fit at a large font scale;
+ * the tracking reduction is there so that no shipped language reaches it.
  */
 @Composable
 fun GlassStatCard(
@@ -246,6 +267,15 @@ fun GlassStatCard(
     val interaction = remember { MutableInteractionSource() }
     val pressed by interaction.collectIsPressedAsState()
     val settle = remember { Animatable(1f) }
+
+    /*
+     * Resolved here rather than inside `semantics`, which is read outside a
+     * composable: a screen reader asking for this plate's description has to get
+     * the active language's wording, not whichever one happened to be current
+     * when the modifier was built.
+     */
+    val playLevelLabel = stringResource(R.string.a11y_play_level, value)
+    val statLabel = stringResource(R.string.a11y_stat_value, label, value)
 
     LaunchedEffect(pressed) {
         settle.snapTo(if (pressed) 0.96f else 1f)
@@ -282,12 +312,12 @@ fun GlassStatCard(
                 .clickable(
                     interactionSource = interaction,
                     indication = null,
-                    onClickLabel = "Play level $value",
+                    onClickLabel = playLevelLabel,
                     onClick = onClick
                 )
                 .semantics {
                     role = Role.Button
-                    contentDescription = "$label $value"
+                    contentDescription = statLabel
                 }
         }
     ) {
@@ -310,14 +340,17 @@ fun GlassStatCard(
         ) {
             StatBadgeIcon(badge = badge, modifier = Modifier.size(38.dp))
             Spacer(Modifier.width(12.dp))
-            Column {
+            Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = label,
                     color = MenuTextDim,
                     fontFamily = UiSans,
-                    fontSize = 12.sp,
+                    fontSize = 11.sp,
                     fontWeight = FontWeight.SemiBold,
-                    letterSpacing = 2.6.sp
+                    letterSpacing = 0.5.sp,
+                    maxLines = 1,
+                    softWrap = false,
+                    overflow = TextOverflow.Ellipsis
                 )
                 Spacer(Modifier.height(1.dp))
                 Text(
@@ -500,7 +533,7 @@ fun PlayerNamePlate(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "PLAYER",
+                text = stringResource(R.string.home_player_label),
                 color = MenuTextDim,
                 fontFamily = UiSans,
                 fontSize = 10.sp,
@@ -613,7 +646,7 @@ fun GlossyIconButton(
  */
 @Composable
 fun PlayButton(
-    label: String = "PLAY",
+    label: String = stringResource(R.string.action_play),
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -625,7 +658,7 @@ fun PlayButton(
         modifier = modifier
             .fillMaxWidth()
             .height(face + pill)
-            .clickable(onClickLabel = "Play", onClick = onClick)
+            .clickable(onClickLabel = stringResource(R.string.a11y_play), onClick = onClick)
             .semantics { role = Role.Button },
         contentAlignment = Alignment.TopCenter
     ) {
@@ -1001,6 +1034,14 @@ fun NeonProgressBar(
     }
 }
 
+/**
+ * The result card's primary button.
+ *
+ * `heightIn` rather than `height`, and two lines rather than one, because the
+ * label is a translated word: German "LEVELÜBERSICHT" and Spanish "CONTINUAR +
+ * ♥ (ANUNCIO)" are both wider than the English they replace, and a fixed 54dp
+ * would clip the second line instead of growing to hold it.
+ */
 @Composable
 fun PrimaryButton(
     label: String,
@@ -1011,12 +1052,19 @@ fun PrimaryButton(
 ) {
     Button(
         onClick = onClick,
-        modifier = modifier.fillMaxWidth().height(54.dp),
+        modifier = modifier.fillMaxWidth().heightIn(min = 54.dp).padding(vertical = 4.dp),
         shape = RoundedCornerShape(16.dp),
         colors = ButtonDefaults.buttonColors(containerColor = containerColor, contentColor = contentColor),
         elevation = ButtonDefaults.buttonElevation(defaultElevation = 5.dp)
     ) {
-        Text(label, fontWeight = FontWeight.Black, fontSize = 16.sp, letterSpacing = 0.5.sp)
+        Text(
+            label,
+            fontWeight = FontWeight.Black,
+            fontSize = 16.sp,
+            letterSpacing = 0.5.sp,
+            textAlign = TextAlign.Center,
+            maxLines = 2
+        )
     }
 }
 
@@ -1030,12 +1078,18 @@ fun SecondaryButton(
 ) {
     Button(
         onClick = onClick,
-        modifier = modifier.fillMaxWidth().height(50.dp),
+        modifier = modifier.fillMaxWidth().heightIn(min = 50.dp).padding(vertical = 4.dp),
         shape = RoundedCornerShape(16.dp),
         colors = ButtonDefaults.buttonColors(containerColor = containerColor, contentColor = contentColor),
         elevation = ButtonDefaults.buttonElevation(defaultElevation = 0.dp)
 ) {
-        Text(label, fontWeight = FontWeight.Bold, fontSize = 15.sp)
+        Text(
+            label,
+            fontWeight = FontWeight.Bold,
+            fontSize = 15.sp,
+            textAlign = TextAlign.Center,
+            maxLines = 2
+        )
     }
 }
 
@@ -1075,7 +1129,15 @@ fun ResultOverlay(
             modifier = Modifier.padding(28.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(title, color = titleColor, fontWeight = FontWeight.Black, fontSize = 24.sp, letterSpacing = 1.sp)
+            Text(
+                title,
+                color = titleColor,
+                fontWeight = FontWeight.Black,
+                fontSize = 24.sp,
+                letterSpacing = 1.sp,
+                textAlign = TextAlign.Center,
+                maxLines = 2
+            )
             if (stars != null) {
                 Spacer(Modifier.height(14.dp))
                 StarRow(stars = stars, tint = starTint)

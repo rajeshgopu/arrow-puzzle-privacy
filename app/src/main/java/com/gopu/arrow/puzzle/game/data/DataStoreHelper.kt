@@ -22,6 +22,7 @@ object DataStoreHelper {
     private val HAPTICS_ENABLED = booleanPreferencesKey("haptics_enabled")
     private val TUTORIAL_SEEN = booleanPreferencesKey("tutorial_seen")
     private val LAUNCH_ANIMATION = stringPreferencesKey("launch_animation")
+    private val LANGUAGE_TAG = stringPreferencesKey("language_tag")
 
     suspend fun saveHighestUnlockedLevel(context: Context, level: Int) {
         context.dataStore.edit { prefs ->
@@ -92,5 +93,31 @@ object DataStoreHelper {
         return context.dataStore.data.map { prefs ->
             LaunchAnimationStyle.fromName(prefs[LAUNCH_ANIMATION])
         }
+    }
+
+    /**
+     * Stores the language the player picked, or clears the choice.
+     *
+     * This is its own key in the same preferences file as the stars, the
+     * unlocked level, the sound and haptics toggles and the tutorial flag, and
+     * `edit` writes that one key and nothing else - so changing the language
+     * cannot rewrite, reset or migrate a player's progress. There is nothing
+     * language-specific about that progress to migrate either: level ids, star
+     * counts and the highest unlocked level are all plain numbers and stable
+     * asset names.
+     *
+     * A null tag removes the key rather than storing an empty string, which
+     * makes "follow the device" and "never chose" the same state and therefore
+     * the same thing on a fresh install and on an upgraded one.
+     */
+    suspend fun saveLanguageTag(context: Context, tag: String?) {
+        context.dataStore.edit { prefs ->
+            if (tag.isNullOrBlank()) prefs.remove(LANGUAGE_TAG) else prefs[LANGUAGE_TAG] = tag
+        }
+    }
+
+    /** The stored language tag, or null when the player has not chosen one. */
+    fun observeLanguageTag(context: Context): Flow<String?> {
+        return context.dataStore.data.map { it[LANGUAGE_TAG] }
     }
 }

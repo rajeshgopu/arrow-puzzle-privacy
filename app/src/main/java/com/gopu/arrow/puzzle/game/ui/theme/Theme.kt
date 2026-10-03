@@ -204,14 +204,28 @@ private val ArrowColorScheme = lightColorScheme(
     outline = TealInk.copy(alpha = 0.18f)
 )
 
-private val ArrowTypography = Typography(
-    displaySmall = TextStyle(fontFamily = DisplaySerif, fontWeight = FontWeight.Black, fontSize = 44.sp, letterSpacing = 2.sp),
-    headlineMedium = TextStyle(fontFamily = UiSans, fontWeight = FontWeight.ExtraBold, fontSize = 26.sp, letterSpacing = 1.sp),
-    titleLarge = TextStyle(fontFamily = UiSans, fontWeight = FontWeight.Bold, fontSize = 20.sp),
-    titleMedium = TextStyle(fontFamily = UiSans, fontWeight = FontWeight.Bold, fontSize = 16.sp),
-    labelLarge = TextStyle(fontFamily = UiSans, fontWeight = FontWeight.Bold, fontSize = 15.sp, letterSpacing = 0.5.sp),
-    bodyMedium = TextStyle(fontFamily = UiSans, fontWeight = FontWeight.Medium, fontSize = 14.sp)
-)
+/**
+ * The type scale.
+ *
+ * A composable rather than a val because the families are locale-aware: [UiSans]
+ * and [DisplaySerif] resolve to the system family on a Japanese or Korean
+ * device, which the theme has to see before it hands a Typography to
+ * MaterialTheme. This is also why `ArrowPuzzleTheme` is composed inside
+ * `LocalizedApp` rather than around it.
+ */
+@Composable
+private fun arrowTypography(): Typography {
+    val sans = UiSans
+    val serif = DisplaySerif
+    return Typography(
+        displaySmall = TextStyle(fontFamily = serif, fontWeight = FontWeight.Black, fontSize = 44.sp, letterSpacing = 2.sp),
+        headlineMedium = TextStyle(fontFamily = sans, fontWeight = FontWeight.ExtraBold, fontSize = 26.sp, letterSpacing = 1.sp),
+        titleLarge = TextStyle(fontFamily = sans, fontWeight = FontWeight.Bold, fontSize = 20.sp),
+        titleMedium = TextStyle(fontFamily = sans, fontWeight = FontWeight.Bold, fontSize = 16.sp),
+        labelLarge = TextStyle(fontFamily = sans, fontWeight = FontWeight.Bold, fontSize = 15.sp, letterSpacing = 0.5.sp),
+        bodyMedium = TextStyle(fontFamily = sans, fontWeight = FontWeight.Medium, fontSize = 14.sp)
+    )
+}
 
 private val ArrowShapes = Shapes(
     extraSmall = RoundedCornerShape(6.dp),
@@ -225,7 +239,7 @@ private val ArrowShapes = Shapes(
 fun ArrowPuzzleTheme(content: @Composable () -> Unit) {
     MaterialTheme(
         colorScheme = ArrowColorScheme,
-        typography = ArrowTypography,
+        typography = arrowTypography(),
         shapes = ArrowShapes,
         content = content
     )

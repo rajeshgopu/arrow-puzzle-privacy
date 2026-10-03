@@ -60,6 +60,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.SpanStyle
@@ -71,6 +72,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.gopu.arrow.puzzle.game.PuzzleLevel
+import com.gopu.arrow.puzzle.game.R
 import com.gopu.arrow.puzzle.game.ads.AdHost
 import com.gopu.arrow.puzzle.game.ads.BannerAdSlot
 import com.gopu.arrow.puzzle.game.data.ProgressRepository
@@ -309,9 +311,12 @@ private fun LevelSelectBackdrop(modifier: Modifier = Modifier) {
 }
 
 /**
- * Back arrow, two-tone wordmark and the star/settings cluster. The title keeps
- * its own weight rather than being laid out by `SpaceBetween`, which keeps it
- * optically centred no matter how wide the star counter grows.
+ * Back arrow, two-tone wordmark and the star/settings cluster.
+ *
+ * The title takes the width left over rather than being laid out by
+ * `SpaceBetween` between two weighted gaps: the counter's width depends on how
+ * many stars the player has and on how that number is written in their language,
+ * so only a weighted title stays optically centred as all three vary.
  */
 @Composable
 private fun LevelSelectHeader(
@@ -325,29 +330,43 @@ private fun LevelSelectHeader(
     ) {
         GlassIconButton(
             icon = Icons.AutoMirrored.Filled.ArrowBack,
-            contentDescription = "Back",
+            contentDescription = stringResource(R.string.a11y_back),
             onClick = onBack
         )
-        Spacer(Modifier.weight(1f))
-        ScreenTitle()
-        Spacer(Modifier.weight(1f))
+        Spacer(Modifier.width(6.dp))
+        ScreenTitle(modifier = Modifier.weight(1f).padding(horizontal = 6.dp))
+        Spacer(Modifier.width(6.dp))
         StarCounter(stars = totalStars)
         Spacer(Modifier.width(8.dp))
         GlassIconButton(
             icon = Icons.Default.Settings,
-            contentDescription = "Settings",
+            contentDescription = stringResource(R.string.a11y_settings),
             onClick = onSettings
         )
     }
 }
 
+/**
+ * The two-tone screen title, ink on the first word and the gradient accent on
+ * the second, over a small rule.
+ *
+ * Weighted and allowed two lines rather than centred between two weighted gaps
+ * at a single fixed size. "SELECT LEVEL" barely fits beside the star counter on a
+ * 360dp phone already, and German "LEVEL AUSWÄHLEN" or Spanish "ELIGE NIVEL" do
+ * not, so the title now takes the space that is actually left and wraps into it.
+ * The counter and the buttons keep their sizes either way, which is what stops
+ * the header breaking rather than the words.
+ */
 @Composable
 private fun ScreenTitle(modifier: Modifier = Modifier) {
-    val title = remember {
+    val first = stringResource(R.string.level_select_title_first)
+    val second = stringResource(R.string.level_select_title_second)
+    val title = remember(first, second) {
         buildAnnotatedString {
-            withStyle(SpanStyle(color = NavyInk)) { append("SELECT ") }
+            withStyle(SpanStyle(color = NavyInk)) { append(first) }
+            append(' ')
             withStyle(SpanStyle(brush = Brush.horizontalGradient(listOf(AccentViolet, AccentAzure)))) {
-                append("LEVEL")
+                append(second)
             }
         }
     }
@@ -357,11 +376,12 @@ private fun ScreenTitle(modifier: Modifier = Modifier) {
             text = title,
             color = NavyInk,
             fontFamily = UiSans,
-            fontSize = 22.sp,
+            fontSize = 20.sp,
+            lineHeight = 24.sp,
             fontWeight = FontWeight.Black,
             letterSpacing = 0.4.sp,
             textAlign = TextAlign.Center,
-            maxLines = 1
+            maxLines = 2
         )
         Spacer(Modifier.height(6.dp))
         Box(
@@ -471,7 +491,7 @@ private fun PackSelector(
         Row(verticalAlignment = Alignment.CenterVertically) {
             GlassIconButton(
                 icon = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
-                contentDescription = "Previous pack",
+                contentDescription = stringResource(R.string.a11y_previous_pack),
                 onClick = onPrevious,
                 size = 40.dp,
                 enabled = current > 0
@@ -482,14 +502,25 @@ private fun PackSelector(
                     .padding(horizontal = 6.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                /*
+                 * Two lines and a size a step under the original 15sp. The
+                 * counter is "PACK 3 / 5" in English but "PAQUETE 3 / 5" in
+                 * Spanish and "PACOTE 3 / 5" in Brazilian Portuguese, between two
+                 * 40dp arrows in a fixed pill - which is a narrower box than the
+                 * English ever needed. Wrapping keeps the dots below it visible
+                 * and the pill growing, instead of the counter being clipped to
+                 * a line and a half.
+                 */
                 Text(
-                    text = "PACK ${current + 1} / $total",
+                    text = stringResource(R.string.pack_counter, current + 1, total),
                     color = NavyInk,
                     fontFamily = UiSans,
-                    fontSize = 15.sp,
+                    fontSize = 14.sp,
+                    lineHeight = 17.sp,
                     fontWeight = FontWeight.Black,
-                    letterSpacing = 0.4.sp,
-                    maxLines = 1
+                    letterSpacing = 0.2.sp,
+                    textAlign = TextAlign.Center,
+                    maxLines = 2
                 )
                 Spacer(Modifier.height(6.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -500,7 +531,7 @@ private fun PackSelector(
             }
             GlassIconButton(
                 icon = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                contentDescription = "Next pack",
+                contentDescription = stringResource(R.string.a11y_next_pack),
                 onClick = onNext,
                 size = 40.dp,
                 enabled = current < total - 1
@@ -640,7 +671,7 @@ private fun PackProgressCard(
                 Spacer(Modifier.width(10.dp))
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = "PACK $packNumber",
+                        text = stringResource(R.string.pack_title, packNumber),
                         color = NavyInk,
                         fontFamily = UiSans,
                         fontSize = 17.sp,
@@ -649,12 +680,12 @@ private fun PackProgressCard(
                         maxLines = 1
                     )
                     Text(
-                        text = "$cleared of $total cleared",
+                        text = stringResource(R.string.progress_cleared_format, cleared, total),
                         color = NavyMuted,
                         fontFamily = UiSans,
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Medium,
-                        maxLines = 1
+                        maxLines = 2
                     )
                 }
                 Spacer(Modifier.width(8.dp))
@@ -683,7 +714,7 @@ private fun PackProgressCard(
                 )
                 Spacer(Modifier.width(10.dp))
                 Text(
-                    text = "$percent%",
+                    text = stringResource(R.string.pack_percent, percent),
                     color = if (complete) ProgressGreen else NavyMuted,
                     fontFamily = UiSans,
                     fontSize = 12.sp,
@@ -745,6 +776,13 @@ private fun LevelCard(
     val starSize = (height.value * 0.16f).coerceIn(13f, 21f).dp
     val glossSize = (height.value * 0.26f).coerceIn(14f, 30f).dp
 
+    // Formatted before the semantics block, which is read outside a composable.
+    val announcement = if (isUnlocked) {
+        stringResource(R.string.a11y_level_stars, order, stars)
+    } else {
+        stringResource(R.string.a11y_level_locked, order)
+    }
+
     Box(
         modifier = Modifier
             .size(width, height)
@@ -768,11 +806,7 @@ private fun LevelCard(
                 onClick = onClick
             )
             .semantics {
-                contentDescription = if (isUnlocked) {
-                    "Level $order, $stars of 3 stars"
-                } else {
-                    "Level $order, locked"
-                }
+                contentDescription = announcement
             },
         contentAlignment = Alignment.Center
     ) {
@@ -879,16 +913,18 @@ private fun ComingSoonPack(packNumber: Int) {
             )
             Spacer(Modifier.height(14.dp))
             Text(
-                text = "PACK $packNumber",
+                text = stringResource(R.string.pack_coming_soon_title, packNumber),
                 color = NavyInk,
                 fontFamily = UiSans,
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Black,
-                letterSpacing = 0.5.sp
+                letterSpacing = 0.5.sp,
+                textAlign = TextAlign.Center,
+                maxLines = 1
             )
             Spacer(Modifier.height(6.dp))
             Text(
-                text = "More puzzles are on the way",
+                text = stringResource(R.string.pack_coming_soon_body),
                 color = NavyMuted,
                 fontFamily = UiSans,
                 fontSize = 14.sp,
