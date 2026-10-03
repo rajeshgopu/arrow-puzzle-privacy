@@ -105,6 +105,12 @@ Ads sit behind a UMP consent gate, so nothing is requested until Google's
 consent state allows it. Settings > Privacy Options reopens the consent form,
 which is what the Play Store requires once ads are served.
 
+The store listing commits to the Play Families policy, so every ad request is
+tagged for child-directed treatment before the SDK initializes. Ads are
+therefore non-personalized for every player, not just for the children in the
+audience, because the app never asks anyone's age and so cannot know who is
+asking.
+
 ## Google Play Games
 
 The game asks Google Play Games who the player is, once, at launch, and never

@@ -14,6 +14,7 @@ import com.google.android.gms.ads.AdError
 import com.google.android.gms.ads.FullScreenContentCallback
 import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.MobileAds
+import com.google.android.gms.ads.RequestConfiguration
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.google.android.gms.ads.rewarded.RewardedAd
@@ -69,6 +70,16 @@ class AdMobController(
             AdConsent.canRequestAds.filter { it }.first()
             Log.i(Tag, "Consent allows ads; initializing MobileAds (appId=${admobAppId(context)})")
             runCatching {
+                // Families policy: the Play listing commits to it, and a
+                // committed app cannot know its audience's age, so every
+                // request is treated as a child's. Must be set before init.
+                MobileAds.setRequestConfiguration(
+                    RequestConfiguration.Builder()
+                        .setTagForChildDirectedTreatment(
+                            RequestConfiguration.TAG_FOR_CHILD_DIRECTED_TREATMENT_TRUE
+                        )
+                        .build()
+                )
                 MobileAds.initialize(context) {
                     Log.i(Tag, "MobileAds initialized")
                     loadRewarded()
