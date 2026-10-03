@@ -8,10 +8,14 @@
         android:supportsRtl="true"
         android:icon="@mipmap/ic_launcher"
         android:roundIcon="@mipmap/ic_launcher" 
+        android:appCategory="game"
         android:theme="@style/Theme.ArrowPuzzle">
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="${admobAppId}" />
+        <meta-data
+            android:name="android.game_mode_config"
+            android:resource="@xml/game_mode_config" />
         <activity
             android:name="com.gopu.arrow.puzzle.game.MainActivity"
             android:exported="true"
@@ -19,6 +23,7 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.GAME" />
             </intent-filter>
         </activity>
     </application>
