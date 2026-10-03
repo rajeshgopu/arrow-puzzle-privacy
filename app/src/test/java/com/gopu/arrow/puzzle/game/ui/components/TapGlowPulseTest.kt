@@ -207,19 +207,28 @@ class TapGlowPulseTest {
     }
 
     @Test
-    fun styleDefaultsToTheGlowPulseSoTheEffectIsAlreadyThere() {
-        assertSame(LaunchAnimationStyle.GLOW_PULSE, LaunchAnimationStyle.Default)
+    fun styleDefaultsToMinimalSoAMoveStaysQuiet() {
+        assertSame(LaunchAnimationStyle.MINIMAL, LaunchAnimationStyle.Default)
         assertTrue(LaunchAnimationStyle.Default.animatesTap)
     }
 
     @Test
-    fun theDefaultStyleIsThePlainGlowPulse() {
+    fun theDefaultStyleIsTheMinimalBloom() {
         assertEquals(
             "an unconfigured default has to keep meaning the documented one",
+            launchProfile(LaunchAnimationStyle.MINIMAL).pulse,
+            launchProfile(LaunchAnimationStyle.Default).pulse
+        )
+        assertNull(launchProfile(LaunchAnimationStyle.Default).burst)
+        assertEquals(
+            0f,
+            launchProfile(LaunchAnimationStyle.Default).pulse.ringIntensity,
+            tolerance
+        )
+        assertEquals(
             TapGlowPulseConfig(),
             launchProfile(LaunchAnimationStyle.GLOW_PULSE).pulse
         )
-        assertNull(launchProfile(LaunchAnimationStyle.Default).burst)
     }
 
     @Test

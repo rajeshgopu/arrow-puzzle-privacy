@@ -36,7 +36,7 @@ enum class LaunchAnimationStyle(@StringRes val labelRes: Int, val implemented: B
     /** No launch animation at all. */
     OFF(R.string.launch_style_off, true),
 
-    /** A brief, quiet bloom on the arrow and nothing else. */
+    /** A brief, quiet bloom on the arrow and nothing else. The shipped default. */
     MINIMAL(R.string.launch_style_minimal, true),
 
     /** A soft glow pulse on the tapped arrow, then the usual departure. */
@@ -59,10 +59,11 @@ enum class LaunchAnimationStyle(@StringRes val labelRes: Int, val implemented: B
         /**
          * What the game ships with.
          *
-         * The glow pulse is the default so the effect is already there for
-         * everyone who never opens the settings screen.
+         * Minimal is the default: the quietest style that still reads as a
+         * launch, so the tap is acknowledged without decorating every move.
+         * Anyone who wants more picks it in settings.
          */
-        val Default = GLOW_PULSE
+        val Default = MINIMAL
 
         /** Every option, in the order the settings screen lists them. */
         val options: List<LaunchAnimationStyle> = entries
@@ -114,8 +115,8 @@ internal fun launchProfile(style: LaunchAnimationStyle): LaunchAnimationProfile 
         burst = null
     )
 
-    // The quietest style that still reads as a launch: a small bloom, no ring,
-    // no sparks, and the arrow barely lifting.
+    // The shipped default: a small bloom, no ring, no sparks, and the arrow
+    // barely lifting.
     LaunchAnimationStyle.MINIMAL -> LaunchAnimationProfile(
         style = style,
         pulse = TapGlowPulseConfig(
@@ -133,8 +134,8 @@ internal fun launchProfile(style: LaunchAnimationStyle): LaunchAnimationProfile 
         burst = null
     )
 
-    // The polished default: a soft glow, a subtle light ring and a hot centre,
-    // all sized off the arrow and all gone inside a tenth of a second.
+    // The glow alone: a soft glow, a subtle light ring and a hot centre, all
+    // sized off the arrow and all gone inside a tenth of a second.
     LaunchAnimationStyle.GLOW_PULSE -> LaunchAnimationProfile(
         style = style,
         pulse = TapGlowPulseConfig(),

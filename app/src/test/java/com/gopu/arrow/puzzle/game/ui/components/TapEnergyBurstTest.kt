@@ -381,7 +381,7 @@ class LaunchAnimationProfileTest {
             assertSame(style, LaunchAnimationStyle.fromName(style.name))
         }
         assertSame(LaunchAnimationStyle.Default, LaunchAnimationStyle.fromName(null))
-        assertSame(LaunchAnimationStyle.GLOW_PULSE, LaunchAnimationStyle.Default)
+        assertSame(LaunchAnimationStyle.MINIMAL, LaunchAnimationStyle.Default)
         assertEquals(
             listOf(
                 R.string.launch_style_off,
