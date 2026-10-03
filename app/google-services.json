@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "969769948490",
+    "project_id": "arrowpuzzle-3e7dd",
+    "storage_bucket": "arrowpuzzle-3e7dd.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:969769948490:android:26bdb9a61fd3e55f09ddb3",
+        "android_client_info": {
+          "package_name": "com.gopu.arrow.puzzle.game"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAUulnrmhtN-kOuVh_2BkQ9-D6LWwU1p6Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

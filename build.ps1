@@ -2,7 +2,8 @@
 param(
     [ValidateSet("Debug", "Release")]
     [string]$Variant = "Debug",
-    [switch]$Clean
+    [switch]$Clean,
+    [switch]$Bundle
 )
 
 Set-StrictMode -Version Latest
@@ -51,7 +52,7 @@ $env:ANDROID_HOME = $sdkPath
 $env:ANDROID_SDK_ROOT = $sdkPath
 
 if ($Variant -eq "Release" -and -not (Test-Path -LiteralPath (Join-Path $projectRoot "signing.properties"))) {
-    Write-Warning "No signing.properties found. Gradle will create an unsigned release APK."
+    Write-Warning "No signing.properties found. Gradle will create an unsigned release artifact."
 }
 
 if ($Clean) {
@@ -59,17 +60,31 @@ if ($Clean) {
     if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 }
 
-$task = if ($Variant -eq "Debug") { ":app:assembleDebug" } else { ":app:assembleRelease" }
+$variantTask = $Variant.ToLowerInvariant()
+
+if ($Bundle) {
+    $task = ":app:bundle$($Variant.Substring(0, 1).ToUpperInvariant())$($Variant.Substring(1).ToLowerInvariant())"
+} else {
+    $task = ":app:assemble$($Variant.Substring(0, 1).ToUpperInvariant())$($Variant.Substring(1).ToLowerInvariant())"
+}
+
 & $gradleWrapper $task
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
-$outputDirectory = Join-Path $projectRoot "app\build\outputs\apk\$($Variant.ToLowerInvariant())"
-$apk = Get-ChildItem -LiteralPath $outputDirectory -Filter "*.apk" |
+if ($Bundle) {
+    $outputDirectory = Join-Path $projectRoot "app\build\outputs\bundle\$variantTask"
+    $extension = "aab"
+} else {
+    $outputDirectory = Join-Path $projectRoot "app\build\outputs\apk\$variantTask"
+    $extension = "apk"
+}
+
+$artifact = Get-ChildItem -LiteralPath $outputDirectory -Filter "*.$extension" |
     Sort-Object LastWriteTime -Descending |
     Select-Object -First 1
 
-if ($apk) {
-    Write-Host "Built $Variant APK: $($apk.FullName)"
+if ($artifact) {
+    Write-Host "Built $Variant $($extension.ToUpperInvariant()): $($artifact.FullName)"
 } else {
-    throw "Build completed but no APK was found in $outputDirectory"
+    throw "Build completed but no $extension was found in $outputDirectory"
 }

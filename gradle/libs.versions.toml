@@ -9,6 +9,7 @@ coroutines = "1.7.3"
 playServicesAds = "24.0.0"
 userMessagingPlatform = "3.1.0"
 playServicesGamesV2 = "22.1.0"
+googleServices = "4.4.2"
 
 [libraries]
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
@@ -29,3 +30,4 @@ user-messaging-platform = { group = "com.google.android.ump", name = "user-messa
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+google-services = { id = "com.google.gms.google-services", version.ref = "googleServices" }
