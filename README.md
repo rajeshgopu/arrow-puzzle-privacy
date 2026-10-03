@@ -65,6 +65,39 @@ Ads sit behind a UMP consent gate, so nothing is requested until Google's
 consent state allows it. Settings > Privacy Options reopens the consent form,
 which is what the Play Store requires once ads are served.
 
+## Google Play Games
+
+The game asks Google Play Games who the player is, once, at launch, and never
+waits for the answer. If Play Games identifies a player, their name appears on
+the home menu under the level and star plates; if it cannot - no Play Games
+account, no Play Store, offline, the player declined, or Google simply does not
+answer - the game carries on as a guest. There is no login screen and no
+sign-in prompt of this app's own; the only screen that can ever appear is
+Google's own, and only when Google decides it is needed.
+
+Progression is unaffected either way. The level lives in local DataStore
+(`highest_unlocked_level`) and is owned by the game alone - Play Games is never
+told what level the player is on, and a failed sign-in cannot reset it. There is
+no cloud save.
+
+To get a real player identity, set the app up in the Play Console:
+
+1. Publish or enroll the app in the Play Console, then open
+   **Play Games Services > Setup** and turn it on.
+2. Add the SHA-1 certificate fingerprints of every signing key that will ship
+   or be installed - the upload key **and** the app signing key, plus the debug
+   key if you want Play Games to work on debug builds. A build signed by a key
+   that is not listed gets no player.
+3. Leave the other Play Games features (achievements, leaderboards, Saved Games)
+   off; this integration only reads the player identity.
+
+Until that is done the app is simply a guest, which is a complete and playable
+state - the game logs the reason under the `PlayGames` tag:
+
+```powershell
+adb logcat -s PlayGames
+```
+
 ## Release Signing
 
 The release build is unsigned until a local `signing.properties` file exists.

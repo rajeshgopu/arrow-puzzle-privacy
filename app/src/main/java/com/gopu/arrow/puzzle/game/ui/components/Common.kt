@@ -66,6 +66,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.gopu.arrow.puzzle.game.ui.theme.Cloud
@@ -439,6 +440,89 @@ private fun StatBadgeIcon(badge: StatBadge, modifier: Modifier = Modifier) {
                 path = path,
                 color = Color.White.copy(alpha = 0.40f),
                 style = Stroke(width = edge * 0.05f, join = StrokeJoin.Round)
+            )
+        }
+    }
+}
+
+/**
+ * The signed-in player's name, on a wide shallow plate in the same glass as the
+ * stat cards.
+ *
+ * It is a plate rather than a line of text because the menu reads light on a
+ * dark field and a bare name would sit on the sky unsupported. It carries no
+ * badge and no number, so the value runs at a size that suits a word rather
+ * than a tally, and it is only ever composed when there is a name to show: a
+ * guest sees exactly the menu they saw before, with nothing reserved and no gap
+ * where this would have been.
+ *
+ * A name can be long, so it is trimmed to one line and shortened at the end
+ * rather than being allowed to wrap or ellipsize on width alone - the plate is a
+ * fixed height, so a second line would have nowhere to go.
+ */
+@Composable
+fun PlayerNamePlate(
+    name: String,
+    modifier: Modifier = Modifier
+) {
+    val density = LocalDensity.current
+    val shape = RoundedCornerShape(20.dp)
+
+    Box(
+        modifier = modifier
+            .height(46.dp)
+            .clip(shape)
+            .background(
+                Brush.verticalGradient(
+                    0f to GlassTop,
+                    0.45f to GlassMid,
+                    1f to GlassDeep
+                )
+            )
+            .border(1.5.dp, GlassRim, shape)
+    ) {
+        // The same sheen across the top half the stat cards carry.
+        Box(
+            modifier = Modifier
+                .matchParentSize()
+                .background(
+                    Brush.verticalGradient(
+                        0f to Color.White.copy(alpha = 0.26f),
+                        0.55f to Color.Transparent
+                    )
+                )
+        )
+
+        Row(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "PLAYER",
+                color = MenuTextDim,
+                fontFamily = UiSans,
+                fontSize = 10.sp,
+                fontWeight = FontWeight.SemiBold,
+                letterSpacing = 2.2.sp
+            )
+            Spacer(Modifier.width(12.dp))
+            Text(
+                text = name,
+                color = Color.White,
+                fontFamily = UiSans,
+                fontSize = 17.sp,
+                fontWeight = FontWeight.ExtraBold,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                style = TextStyle(
+                    shadow = Shadow(
+                        color = DiscDeep.copy(alpha = 0.85f),
+                        offset = Offset(0f, with(density) { 1.dp.toPx() }),
+                        blurRadius = 0f
+                    )
+                )
             )
         }
     }

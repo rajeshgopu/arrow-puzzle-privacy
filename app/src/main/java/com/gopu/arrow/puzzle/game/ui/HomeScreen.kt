@@ -1,5 +1,9 @@
 package com.gopu.arrow.puzzle.game.ui
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -33,12 +37,14 @@ import com.gopu.arrow.puzzle.game.Direction
 import com.gopu.arrow.puzzle.game.ads.AdHost
 import com.gopu.arrow.puzzle.game.ads.BannerAdSlot
 import com.gopu.arrow.puzzle.game.data.ProgressRepository
+import com.gopu.arrow.puzzle.game.playgames.PlayGamesIdentity
 import com.gopu.arrow.puzzle.game.ui.components.FloatingArrowTile
 import com.gopu.arrow.puzzle.game.ui.components.GlassStatCard
 import com.gopu.arrow.puzzle.game.ui.components.GlossyIconButton
 import com.gopu.arrow.puzzle.game.ui.components.HomeBackdrop
 import com.gopu.arrow.puzzle.game.ui.components.MarkGlow
 import com.gopu.arrow.puzzle.game.ui.components.PlayButton
+import com.gopu.arrow.puzzle.game.ui.components.PlayerNamePlate
 import com.gopu.arrow.puzzle.game.ui.components.SkinCyan
 import com.gopu.arrow.puzzle.game.ui.components.SkinGreen
 import com.gopu.arrow.puzzle.game.ui.components.SkinRed
@@ -62,6 +68,13 @@ private const val SideTileShare = 0.20f
 private const val TileClearance = 0.05f
 
 /**
+ * How long the player's name plate takes to arrive. Long enough to read as
+ * deliberate, short enough that it lands while the player is still looking at
+ * the menu rather than after they have started a level.
+ */
+private const val PlayerPlateFadeMillis = 260
+
+/**
  * Main menu.
  *
  * Three things on the screen and nothing competing with them: the wordmark and
@@ -74,6 +87,12 @@ private const val TileClearance = 0.05f
  * Both numbers are on show at once but only one of them is a control: the level
  * plate is the way straight back into the level it reports, and the star total
  * is a tally, not a door.
+ *
+ * The player's Play Games name is a fourth thing that arrives on its own, once
+ * Google has answered, and it is composed only when there is one - so a guest
+ * sees exactly the menu above with no gap reserved for it. It is collected from
+ * [PlayGamesIdentity] rather than passed in, because it is Google's to answer
+ * and nobody is waiting on it here.
  */
 @Composable
 fun HomeScreen(
@@ -86,6 +105,12 @@ fun HomeScreen(
     val highestUnlocked by progressRepository.highestUnlockedLevel.collectAsState(initial = 1)
     val bestStars by progressRepository.bestStars.collectAsState(initial = emptyMap())
     val totalStars = remember(bestStars) { bestStars.values.sum() }
+
+    /*
+     * Null while Google is still deciding, and null forever if the player is a
+     * guest - both render as no plate at all.
+     */
+    val playerName by PlayGamesIdentity.playerName.collectAsState()
 
     BoxWithConstraints(
         modifier = Modifier
@@ -141,6 +166,21 @@ fun HomeScreen(
                     badge = StatBadge.STAR,
                     modifier = Modifier.weight(1f)
                 )
+            }
+
+            /*
+             * The one element on this screen that is not here on the first frame.
+             * It fades in rather than snapping, because the weighted gaps above and
+             * below share out the extra height it takes, so appearing instantly would
+             * nudge the play button under the player's thumb.
+             */
+            AnimatedVisibility(
+                visible = playerName != null,
+                enter = fadeIn(tween(PlayerPlateFadeMillis)) + expandVertically(tween(PlayerPlateFadeMillis))
+            ) {
+                playerName?.let { name ->
+                    PlayerNamePlate(name = name, modifier = Modifier.fillMaxWidth())
+                }
             }
 
             /*

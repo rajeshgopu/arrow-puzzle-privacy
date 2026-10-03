@@ -158,6 +158,7 @@ dependencies {
     implementation(libs.gson)
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.play.services.ads)
+    implementation(libs.play.services.games.v2)
     implementation(libs.user.messaging.platform)
     debugImplementation(libs.androidx.compose.ui.tooling)
     testImplementation("junit:junit:4.13.2")
