@@ -9,7 +9,7 @@
 -->
 <resources>
 
-    <string name="app_name">Arrow Puzzle</string>
+    <string name="app_name">Arrow Puzzle: Tap to Escape</string>
 
     <!-- Main menu -->
     <string name="home_level_label">NIVEAU</string>
@@ -101,7 +101,7 @@
     <string name="about_privacy_policy">Politique de confidentialité</string>
     <string name="consent_saved">Choix de consentement enregistrés.</string>
     <string name="consent_not_required">Aucun choix à faire ici : le consentement n\'est pas requis dans votre région.</string>
-    <string name="about_version">Arrow Puzzle  •  v%1$s</string>
+    <string name="about_version">Arrow Puzzle: Tap to Escape  •  v%1$s</string>
 
     <string name="how_to_play_title">COMMENT JOUER</string>
     <string name="how_to_rule_1">Une flèche ne peut quitter le plateau que si toutes les cases devant elle, jusqu\'au bord, sont vides.</string>

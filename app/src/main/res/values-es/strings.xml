@@ -13,7 +13,7 @@
 -->
 <resources>
 
-    <string name="app_name">Arrow Puzzle</string>
+    <string name="app_name">Arrow Puzzle: Tap to Escape</string>
 
     <!-- Main menu -->
     <string name="home_level_label">NIVEL</string>
@@ -105,7 +105,7 @@
     <string name="about_privacy_policy">Política de privacidad</string>
     <string name="consent_saved">Tus opciones de consentimiento se han guardado.</string>
     <string name="consent_not_required">Aquí no hay nada que elegir: no se requiere consentimiento en tu región.</string>
-    <string name="about_version">Arrow Puzzle  •  v%1$s</string>
+    <string name="about_version">Arrow Puzzle: Tap to Escape  •  v%1$s</string>
 
     <string name="how_to_play_title">CÓMO JUGAR</string>
     <string name="how_to_rule_1">Una flecha solo puede salir del tablero cuando todas las casillas que tiene delante, hasta el borde, están vacías.</string>

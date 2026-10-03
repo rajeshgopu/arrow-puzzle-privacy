@@ -11,7 +11,7 @@
 -->
 <resources>
 
-    <string name="app_name">Arrow Puzzle</string>
+    <string name="app_name">Arrow Puzzle: Tap to Escape</string>
 
     <!-- Main menu -->
     <string name="home_level_label">NÍVEL</string>
@@ -103,7 +103,7 @@
     <string name="about_privacy_policy">Política de privacidade</string>
     <string name="consent_saved">Suas escolhas de consentimento foram salvas.</string>
     <string name="consent_not_required">Nada para escolher aqui: o consentimento não é exigido na sua região.</string>
-    <string name="about_version">Arrow Puzzle  •  v%1$s</string>
+    <string name="about_version">Arrow Puzzle: Tap to Escape  •  v%1$s</string>
 
     <string name="how_to_play_title">COMO JOGAR</string>
     <string name="how_to_rule_1">Uma seta só sai do tabuleiro quando todas as casas à frente dela, até a borda, estão vazias.</string>

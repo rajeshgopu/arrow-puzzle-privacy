@@ -10,7 +10,7 @@
 -->
 <resources>
 
-    <string name="app_name">Arrow Puzzle</string>
+    <string name="app_name">Arrow Puzzle: Tap to Escape</string>
 
     <!-- Main menu -->
     <string name="home_level_label">LEVEL</string>
@@ -103,7 +103,7 @@
     <string name="about_privacy_policy">Datenschutzerklärung</string>
     <string name="consent_saved">Einwilligungswahl gespeichert.</string>
     <string name="consent_not_required">Hier gibt es nichts auszuwählen: In deiner Region ist keine Einwilligung erforderlich.</string>
-    <string name="about_version">Arrow Puzzle  •  v%1$s</string>
+    <string name="about_version">Arrow Puzzle: Tap to Escape  •  v%1$s</string>
 
     <string name="how_to_play_title">SO WIRD GESPielt</string>
     <string name="how_to_rule_1">Ein Pfeil kann das Feld nur verlassen, wenn alle Felder vor ihm bis zum Rand leer sind.</string>

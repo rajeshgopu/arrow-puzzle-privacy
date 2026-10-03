@@ -14,7 +14,7 @@
 -->
 <resources>
 
-    <string name="app_name">Arrow Puzzle</string>
+    <string name="app_name">Arrow Puzzle: Tap to Escape</string>
 
     <!-- Main menu -->
     <string name="home_level_label">레벨</string>
@@ -107,7 +107,7 @@
     <string name="about_privacy_policy">개인정보 처리방침</string>
     <string name="consent_saved">동의 선택이 저장되었습니다.</string>
     <string name="consent_not_required">여기서는 선택할 항목이 없습니다. 해당 지역에서는 동의가 필요하지 않습니다.</string>
-    <string name="about_version">Arrow Puzzle  •  v%1$s</string>
+    <string name="about_version">Arrow Puzzle: Tap to Escape  •  v%1$s</string>
 
     <string name="how_to_play_title">플레이 방법</string>
     <string name="how_to_rule_1">화살표는 진행 방향의 칸이 가장자리까지 모두 비어 있을 때만 보드에서 나갈 수 있습니다.</string>

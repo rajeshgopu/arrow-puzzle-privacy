@@ -141,9 +141,10 @@ class L10nStringsTest {
 
     @Test
     fun theBrandIsNeverTranslated() {
-        // "Arrow Puzzle" is the store listing's search term and the wordmark's
-        // own lettering. A localised app_name would lose both, so it is repeated
-        // verbatim in every file and checked here rather than trusted.
+        // "Arrow Puzzle: Tap to Escape" is the store listing's search term and
+        // the wordmark's own lettering. A localised app_name would lose both,
+        // so it is repeated verbatim in every file and checked here rather than
+        // trusted.
         for ((qualifier, strings) in translated) {
             assertEquals(
                 "$qualifier translated the app name",
@@ -151,7 +152,7 @@ class L10nStringsTest {
                 strings.getValue("app_name")
             )
         }
-        assertEquals("Arrow Puzzle", defaultStrings.getValue("app_name"))
+        assertEquals("Arrow Puzzle: Tap to Escape", defaultStrings.getValue("app_name"))
     }
 
     @Test
@@ -160,7 +161,7 @@ class L10nStringsTest {
         for ((qualifier, strings) in translated) {
             assertTrue(
                 "$qualifier dropped the brand from about_version",
-                strings.getValue("about_version").contains("Arrow Puzzle")
+                strings.getValue("about_version").contains("Arrow Puzzle: Tap to Escape")
             )
         }
     }

@@ -12,8 +12,9 @@
       * Never reword or drop a placeholder. %1$d, %1$s and so on must survive
         verbatim, in the same argument positions, or the string will throw at
         format time. `L10nStringsTest` checks every locale for this.
-      * Do not translate the brand. "Arrow Puzzle" and the ARROW PUZZLE
-        wordmark are proper nouns and stay in English in every locale.
+      * Do not translate the brand. "Arrow Puzzle: Tap to Escape" and the
+        ARROW PUZZLE wordmark are proper nouns and stay in English in every
+        locale.
       * Prepositions and the position of a placeholder are yours to move; the
         placeholder itself is not. "Level %1$d" may become "Niveau %1$d",
         and the word after the number may change, but %1$d must stay first if
@@ -32,7 +33,7 @@
         English brand in every locale - see the store copy in
         docs/store/localization.md for the localised search terms around it.
     -->
-    <string name="app_name" translatable="true">Arrow Puzzle</string>
+    <string name="app_name" translatable="true">Arrow Puzzle: Tap to Escape</string>
 
     <!--
         ==================================================================
@@ -175,7 +176,7 @@
     <string name="about_privacy_policy">Privacy Policy</string>
     <string name="consent_saved">Consent choices saved.</string>
     <string name="consent_not_required">No choices to make here: consent is not required in your region.</string>
-    <string name="about_version">Arrow Puzzle  •  v%1$s</string>
+    <string name="about_version">Arrow Puzzle: Tap to Escape  •  v%1$s</string>
 
     <string name="how_to_play_title">HOW TO PLAY</string>
     <string name="how_to_rule_1">An arrow can leave the board only when every cell in front of it, up to the edge, is empty.</string>

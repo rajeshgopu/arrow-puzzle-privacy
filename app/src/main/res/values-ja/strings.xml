@@ -19,7 +19,7 @@
 -->
 <resources>
 
-    <string name="app_name">Arrow Puzzle</string>
+    <string name="app_name">Arrow Puzzle: Tap to Escape</string>
 
     <!-- Main menu -->
     <string name="home_level_label">レベル</string>
@@ -114,7 +114,7 @@
     <string name="about_privacy_policy">プライバシーポリシー</string>
     <string name="consent_saved">同意の選択を保存しました。</string>
     <string name="consent_not_required">ここでは選択の必要はありません。お住まいの地域では同意が求められていません。</string>
-    <string name="about_version">Arrow Puzzle  •  v%1$s</string>
+    <string name="about_version">Arrow Puzzle: Tap to Escape  •  v%1$s</string>
 
     <string name="how_to_play_title">遊び方</string>
     <string name="how_to_rule_1">矢印は、進む方向のマスが端まですべて空いている場合にだけ盤面から出せます。</string>
