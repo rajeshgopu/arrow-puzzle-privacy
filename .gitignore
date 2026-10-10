@@ -13,6 +13,7 @@ signing.properties
 *.apk
 *.aab
 captures/
+store/client_secret_*.json
 tools/snapshots/
 .externalNativeBuild/
 .DS_Store
