@@ -9,48 +9,31 @@
 <style>
   :root {
     color-scheme: light dark;
-    --bg: #ffffff;
-    --fg: #1c1f24;
-    --muted: #5b6472;
-    --line: #e3e6ea;
-    --card: #f7f8fa;
-    --accent: #2f6df6;
+    --bg: #ffffff; --fg: #1c1f24; --muted: #5b6472;
+    --line: #e3e6ea; --card: #f7f8fa; --accent: #2f6df6;
   }
   @media (prefers-color-scheme: dark) {
     :root {
-      --bg: #111318;
-      --fg: #e8eaed;
-      --muted: #a2abba;
-      --line: #2a2f38;
-      --card: #191c22;
-      --accent: #8ab0ff;
+      --bg: #111318; --fg: #e8eaed; --muted: #a2abba;
+      --line: #2a2f38; --card: #191c22; --accent: #8ab0ff;
     }
   }
   * { box-sizing: border-box; }
   body {
-    margin: 0;
-    padding: 2.5rem 1.25rem 4rem;
-    background: var(--bg);
-    color: var(--fg);
-    font: 16px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-          Helvetica, Arial, sans-serif;
+    margin: 0; padding: 2.5rem 1.25rem 4rem; background: var(--bg);
+    color: var(--fg); font: 16px/1.65 -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   }
   main { max-width: 46rem; margin: 0 auto; }
-  h1 { font-size: 1.9rem; line-height: 1.25; margin: 0 0 .5rem; letter-spacing: -0.02em; }
-  h2 { font-size: 1.15rem; margin: 2.25rem 0 .5rem; letter-spacing: -0.01em; }
+  h1 { font-size: 1.9rem; line-height: 1.25; margin: 0 0 .5rem; letter-spacing: -.02em; }
+  h2 { font-size: 1.15rem; margin: 2.25rem 0 .5rem; letter-spacing: -.01em; }
   p, li { color: var(--fg); }
   .sub { color: var(--muted); margin: 0 0 .25rem; }
   .meta { color: var(--muted); font-size: .875rem; margin: 0 0 1.5rem; }
   ul { padding-left: 1.25rem; }
   li { margin: .4rem 0; }
   a { color: var(--accent); }
-  .card {
-    background: var(--card);
-    border: 1px solid var(--line);
-    border-radius: 10px;
-    padding: .9rem 1.1rem;
-    margin: 1rem 0 1.5rem;
-  }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: .9rem 1.1rem; margin: 1rem 0 1.5rem; }
   .card p { margin: .35rem 0; }
   hr { border: 0; border-top: 1px solid var(--line); margin: 2.5rem 0 1.5rem; }
   footer { color: var(--muted); font-size: .875rem; }
@@ -58,27 +41,25 @@
 </head>
 <body>
 <main>
-
 <h1>Privacy Policy</h1>
 <p class="sub">Arrow Puzzle — Android puzzle game</p>
 <p class="meta">Effective date: 11 October 2026 · Version 1.1</p>
 
 <div class="card">
-  <p><strong>The short version.</strong> Arrow Puzzle stores game progress and settings locally on your device. Depending on the services enabled in the version you use, Firebase may process app usage, diagnostics, performance information, and push-notification tokens. Google AdMob is used to serve and measure advertisements and may process advertising and device-related data. Google Play Games may be used for sign-in or to display your player name if that feature is enabled.</p>
+  <p><strong>The short version.</strong> Arrow Puzzle stores game progress and preferences locally on your device. Google AdMob is used to serve and measure advertisements and may process advertising and device-related information. The app may also use Google Firebase services for analytics, crash diagnostics, performance monitoring, or push notifications if those SDKs are included and enabled in the installed version. Google Play Games may be used to check sign-in status or display your player name if that feature is enabled.</p>
 </div>
 
 <h2>1. Who we are</h2>
 <p>
-  Arrow Puzzle is an Android puzzle game. This policy explains how information may be handled
-  by the game and by third-party services integrated into it, including Google Firebase,
-  Google AdMob, and optionally Google Play Games. The game developer does not operate a
-  separate game backend unless a future version explicitly adds one.
+  Arrow Puzzle is an Android puzzle game. This policy describes information handled by the
+  app and by third-party services that may be integrated into it, including Google AdMob,
+  Google Firebase, and Google Play Games. The developer's use of a Google/Firebase account
+  does not by itself mean every Firebase service is active in the app; only services included
+  and enabled in the released version process data.
 </p>
 
 <h2>2. Information stored on your device</h2>
-<p>
-  The game may save gameplay progress and preferences in Android app storage, such as:
-</p>
+<p>The game may store gameplay progress and preferences in Android's private app storage, including:</p>
 <ul>
   <li>Highest level unlocked and best star rating for each level</li>
   <li>Sound and haptic-feedback preferences</li>
@@ -86,52 +67,50 @@
   <li>Selected launch animation and language preference</li>
 </ul>
 <p>
-  Locally stored progress is not necessarily synced to a cloud account. Uninstalling the app
-  or clearing its storage may delete locally stored progress. If a future version adds cloud
-  saving, this policy will be updated.
+  Locally stored progress is not synced to a cloud account unless a future version explicitly
+  adds that feature. Clearing the app's storage or uninstalling the app may delete locally
+  stored progress.
 </p>
 
 <h2>3. Firebase services</h2>
 <p>
-  The app may use the following Firebase services when they are included and enabled in the
-  installed version:
+  Depending on the SDKs included and enabled in the installed version, the app may use these
+  Google Firebase services:
 </p>
 <ul>
-  <li><strong>Firebase Analytics:</strong> may collect app interactions, usage events, device
-      information, app instance identifiers, and related diagnostic or measurement data to
-      help understand how the game is used.</li>
-  <li><strong>Firebase Crashlytics:</strong> may collect crash reports, stack traces, app
-      state, device details, and technical diagnostic information to identify and fix crashes.</li>
-  <li><strong>Firebase Performance Monitoring:</strong> may collect app startup, network
-      request, and performance trace information to help identify slow or unstable behaviour.</li>
-  <li><strong>Firebase Cloud Messaging (FCM):</strong> may process an app-instance or
-      registration token and message-delivery information to send push notifications if
-      notifications are implemented and enabled. The app may not send notifications in every
-      version.</li>
+  <li><strong>Firebase Analytics (if enabled):</strong> may process app usage events,
+      interactions, app-instance identifiers, device information, and related measurement data.</li>
+  <li><strong>Firebase Crashlytics (if enabled):</strong> may process crash reports, stack
+      traces, app state, device details, and technical diagnostic information.</li>
+  <li><strong>Firebase Performance Monitoring (if enabled):</strong> may process app startup,
+      network request, and performance-trace information.</li>
+  <li><strong>Firebase Cloud Messaging (if enabled):</strong> may process an app-instance or
+      registration token and message-delivery information to deliver push notifications.</li>
 </ul>
 <p>
-  Firebase data handling is governed by Google's applicable terms and policies. Learn more in
-  the <a href="https://firebase.google.com/support/privacy" target="_blank" rel="noopener noreferrer">Firebase Privacy and Security information</a>
+  These categories apply only if the corresponding SDK is actually included and active in
+  the release. Firebase data handling is subject to Google's applicable terms and policies.
+  See the <a href="https://firebase.google.com/support/privacy" target="_blank" rel="noopener noreferrer">Firebase Privacy and Security information</a>
   and the <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">Google Privacy Policy</a>.
 </p>
 
 <h2>4. Advertising (Google AdMob)</h2>
 <p>
   The free version of Arrow Puzzle uses Google AdMob to display advertisements. Depending on
-  the version and ad configuration, the game may display banner, interstitial, and optional
-  rewarded ads.
+  the released build and ad configuration, formats may include banner ads, interstitial ads,
+  and optional rewarded video ads.
 </p>
 <p>
   Google and its advertising partners may process information such as the advertising ID,
-  IP address, device and operating-system information, app interactions, ad views or clicks,
+  IP address, device and operating-system information, app version, ad views or clicks,
   approximate location inferred from IP address, and diagnostic or fraud-prevention signals.
-  The exact data used may depend on your device settings, region, consent choices, and Google's
-  advertising configuration.
+  The information processed can depend on your device settings, region, consent choices,
+  and Google's advertising configuration.
 </p>
 <p>
-  Google's processing is described in the
+  Google's handling of this information is described in the
   <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">Google Privacy Policy</a>,
-  <a href="https://policies.google.com/technologies/ads" target="_blank" rel="noopener noreferrer">How Google uses information from sites or apps that use its services</a>,
+  <a href="https://policies.google.com/technologies/ads" target="_blank" rel="noopener noreferrer">How Google uses information from apps that use its services</a>,
   and <a href="https://support.google.com/admob/answer/6128543" target="_blank" rel="noopener noreferrer">AdMob privacy information</a>.
 </p>
 
@@ -139,59 +118,58 @@
 <p>
   Where required, the app uses Google's User Messaging Platform (UMP) or another applicable
   consent flow to present advertising privacy choices. The choices shown and the ads that can
-  be requested depend on your region, applicable law, and the app's current configuration.
-  Do not assume that declining personalised advertising means all ads are disabled; non-
-  personalised or limited ads may still be available where permitted.
+  be requested depend on your region, applicable law, and the app's implementation.
+  Declining personalised advertising does not necessarily disable all ads; non-personalised
+  or limited ads may still be available where permitted. If the app provides a
+  <strong>Settings → Privacy Options</strong> entry, you can use it to revisit available choices.
 </p>
 <p>
-  If the app provides a <strong>Settings → Privacy Options</strong> entry, you can use it to
-  revisit available consent choices. You can also manage advertising ID and ad-personalisation
-  settings through <a href="https://myadsettings.google.com/" target="_blank" rel="noopener noreferrer">Google Ad Settings</a>
-  and your Android device settings.
+  You can also manage advertising ID and ad-personalisation settings through
+  <a href="https://myadsettings.google.com/" target="_blank" rel="noopener noreferrer">Google Ad Settings</a>
+  and your Android device settings. The actual consent behaviour must match the version of
+  the app that is distributed.
 </p>
 
 <h2>6. Google Play Games</h2>
 <p>
   If Google Play Games features are enabled, the app may check sign-in status or display your
-  Play Games profile name. Any data handled by Google Play Games is subject to the
+  Play Games profile name. Data processed by Google Play Games is subject to the
   <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">Google Privacy Policy</a>
-  and the settings and permissions associated with your Google account. Only describe this
-  feature as enabled if it is present in the released version.
+  and the settings associated with your Google account. The app does not claim to upload
+  gameplay progress, achievements, or leaderboard data unless those features are implemented
+  in the released version.
 </p>
 
 <h2>7. Permissions</h2>
-<p>
-  Depending on the build, the app may request or use permissions and capabilities such as:
-</p>
+<p>Depending on the released build and SDKs, the app may use the following permissions:</p>
 <ul>
-  <li><code>INTERNET</code> — network access for ads and enabled Google services.</li>
-  <li><code>ACCESS_NETWORK_STATE</code> — to check network connectivity where needed.</li>
+  <li><code>INTERNET</code> — network access for advertisements and enabled Google services.</li>
+  <li><code>ACCESS_NETWORK_STATE</code> — to check connectivity where needed.</li>
   <li><code>VIBRATE</code> — for optional haptic feedback.</li>
-  <li><code>POST_NOTIFICATIONS</code> — if the app sends notifications on Android versions that require this permission.</li>
+  <li><code>POST_NOTIFICATIONS</code> — if the app sends notifications and this permission is required by Android.</li>
   <li><code>com.google.android.gms.permission.AD_ID</code> — may be declared by the advertising SDK for advertising-related functions.</li>
 </ul>
-<p>
-  The exact permissions depend on the final app manifest and the SDK versions included in
-  the release.
-</p>
+<p>The exact permissions depend on the app's final Android manifest and included SDK versions.</p>
 
 <h2>8. Children</h2>
 <p>
-  Arrow Puzzle is a general-audience puzzle game. The developer does not knowingly use the
-  game to collect personal information directly from children. Advertising and analytics
-  settings must be configured appropriately for the app's actual target audience and the
-  applicable laws. If you believe information has been handled inappropriately, contact the
-  developer using the details below.
+  Arrow Puzzle is described as a general-audience puzzle game and is not specifically directed
+  at children under 13. If the app is marketed to children or includes children in its intended
+  target audience, its Google Play target-audience settings, advertising configuration, SDKs,
+  and data practices must meet the applicable Google Play Families requirements and local law.
+  The developer does not knowingly use the game to collect personal information directly from
+  children. Contact the developer below if you have a privacy concern.
 </p>
 
 <h2>9. Data sharing, retention, and deletion</h2>
 <p>
   The developer does not sell personal information. Information may be processed by Google
-  through Firebase, AdMob, or Google Play Games as described above. Retention and deletion of
-  data processed by those services are subject to the relevant Google service settings,
-  policies, and retention practices. Local game data can generally be removed by clearing the
-  app's storage or uninstalling the app. You can manage Google account and advertising choices
-  using <a href="https://myaccount.google.com/data-and-privacy" target="_blank" rel="noopener noreferrer">Google My Account</a>.
+  through AdMob, Firebase services enabled in the app, or Google Play Games as described above.
+  Retention and deletion of information processed by these services are subject to the relevant
+  Google service settings, policies, and retention practices. Local game data can generally
+  be removed by clearing the app's storage or uninstalling the app. You can manage Google
+  account and advertising choices using
+  <a href="https://myaccount.google.com/data-and-privacy" target="_blank" rel="noopener noreferrer">Google My Account</a>.
 </p>
 
 <h2>10. Security</h2>
@@ -204,21 +182,18 @@
 <h2>11. Changes to this policy</h2>
 <p>
   This policy may be updated when app features, SDKs, or legal requirements change. The revised
-  policy will be posted at this URL with an updated effective date. Please review it
-  periodically.
+  policy will be posted at this URL with an updated effective date. Please review it periodically.
 </p>
 
 <h2>12. Contact</h2>
 <p>
-  Questions or privacy requests can be sent to
-  <a href="mailto:gopurajesh@gmail.com">gopurajesh@gmail.com</a>.
+  Questions about this policy or privacy requests can be sent to
+  <a href="mailto:gopurajesh@gmail.com">gopurajesh@gmail.com</a>, or raised through the public
+  issue tracker for the app's source repository.
 </p>
 
 <hr>
-<footer>
-  <p>Arrow Puzzle · Version 1.1 · Effective 11 October 2026.</p>
-</footer>
-
+<footer><p>Arrow Puzzle · Version 1.1 · Effective 11 October 2026.</p></footer>
 </main>
 </body>
 </html>
